@@ -105,4 +105,5 @@ venv.bak/
 
 # local ide
 .idea/
+.idea/*
 docs
