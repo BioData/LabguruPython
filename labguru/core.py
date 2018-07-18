@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from requests import HTTPError
 from project import Project
 import api
 import json
@@ -25,8 +26,12 @@ class Labguru(object):
         params = {
             'token': self.session.token
         }
-        response = api.request(url, method='GET', data=params)
-        return Project(**response)
+        try:
+            response = api.request(url, method='GET', data=params)
+            return Project(**response)
+        except HTTPError:
+            raise NotFoundException('Project {id} does not exist'.format(id=project_id))
+
 
 
 class Session(object):
@@ -41,4 +46,8 @@ class Session(object):
 
 
 class UnAuthorizeException(Exception):
+    pass
+
+
+class NotFoundException(Exception):
     pass
