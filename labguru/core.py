@@ -24,13 +24,18 @@ class Labguru(object):
     def create_new_project(self, title, description=None):
         url = api.normalise('/api/v1/projects.json')
         item = Project(title, description)
+
+        assert isinstance(title, str) and len(title) > 0, 'title is required to create a new project'
+
         data = {
             'token': self.session.token,
             'item': item.__dict__
         }
-
-        response = api.request(url, data=data)
-        return Project(**response)
+        try:
+            response = api.request(url, data=data)
+            return Project(**response)
+        except HTTPError:
+            raise DuplicatedException('Duplicated title: {title} in the lab'.format(title=title))
 
     def get_project(self, project_id):
         url = api.normalise('/api/v1/projects/{id}.json'.format(id=project_id))
@@ -72,4 +77,8 @@ class UnAuthorizeException(Exception):
 
 
 class NotFoundException(Exception):
+    pass
+
+
+class DuplicatedException(Exception):
     pass

@@ -26,11 +26,12 @@ def main():
     lab = get_token()
     print(lab.session.token)
 
-    print(create_project(lab, 'Create_Project_From_Python_Package', 'Testing'))
+    # print(create_project(lab, 'Create_Project_From_Python_Package', 'Testing'))
 
     projects = get_all_projects(lab, 1)
     for proj in projects:
-        print(proj)
+        if proj.id == 111:
+            print(proj.create_new_folder(lab.session.token))
 
 if __name__ == '__main__':
     main()

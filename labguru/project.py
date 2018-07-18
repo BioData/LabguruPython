@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from requests import HTTPError
 import json
+import api
+
 
 # {
 # "id": 101,
@@ -22,12 +25,24 @@ import json
 
 
 class Project(object):
-
-    def __init__(self, title, description=None, id=None, *args, **kwargs):
-        self.id = id
+    def __init__(self, title, id=None, description=None, *args, **kwargs):
         self.title = title
+        self.id = id
         self.description = description
         # self.orders = orders
 
     def __str__(self):
         return json.dumps(self.__dict__)
+
+    def create_new_folder(self, token, description=None):
+        url = api.normalise('/api/v1/milestones.json')
+        data = {
+            'token': token,
+            'item': {
+                "project_id": self.id,
+                "owner_id": 1,
+                "title": self.title,
+                "description": "dddddd"
+            }
+        }
+        return api.request(url, data=data)
