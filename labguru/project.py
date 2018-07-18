@@ -42,7 +42,7 @@ class Project(object):
                 "project_id": self.id,
                 "owner_id": 1,
                 "title": self.title,
-                "description": "dddddd"
+                "description": description
             }
         }
         return api.request(url, data=data)
