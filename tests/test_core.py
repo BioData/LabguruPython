@@ -1,6 +1,6 @@
 # tests/test_core.py
 
-from labguru import Labguru, Session, UnAuthorizeException,NotFoundException, Project
+from labguru import Labguru, Session, UnAuthorizeException, NotFoundException, Project
 import pytest
 import vcr
 

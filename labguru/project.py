@@ -22,7 +22,8 @@ import json
 
 
 class Project(object):
-    def __init__(self, id, title, description, *args, **kwargs):
+
+    def __init__(self, title, description=None, id=None, *args, **kwargs):
         self.id = id
         self.title = title
         self.description = description

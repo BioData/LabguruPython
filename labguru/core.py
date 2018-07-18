@@ -21,6 +21,17 @@ class Labguru(object):
         else:
             self.session = Session(**response)
 
+    def create_new_project(self, title, description=None):
+        url = api.normalise('/api/v1/projects.json')
+        item = Project(title, description)
+        data = {
+            'token': self.session.token,
+            'item': item.__dict__
+        }
+
+        response = api.request(url, data=data)
+        return Project(**response)
+
     def get_project(self, project_id):
         url = api.normalise('/api/v1/projects/{id}.json'.format(id=project_id))
         params = {
@@ -32,6 +43,17 @@ class Labguru(object):
         except HTTPError:
             raise NotFoundException('Project {id} does not exist'.format(id=project_id))
 
+    def get_all_projects(self, page_num):
+        url = api.normalise('/api/v1/projects.json')
+        params = {
+            'token': self.session.token,
+            'page': page_num
+        }
+        response = api.request(url, method='GET', data=params)
+        if isinstance(response, list):
+            return [Project(**item) for item in response]
+        else:
+            return []
 
 
 class Session(object):
