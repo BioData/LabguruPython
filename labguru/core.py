@@ -16,7 +16,7 @@ class Labguru(object):
         url = api.normalise('/api/v1/sessions.json')
         response = api.request(url, data=data)
         if response.get('token') == '-1':
-            raise ValueError('Login failed! Wrong email or password')
+            raise UnAuthorizeException('Login failed! Wrong email or password')
         else:
             self.session = Session(**response)
 
@@ -38,3 +38,7 @@ class Session(object):
 
     def __str__(self):
         return json.dumps(self.__dict__)
+
+
+class UnAuthorizeException(Exception):
+    pass
