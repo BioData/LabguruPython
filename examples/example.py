@@ -1,37 +1,21 @@
-from labguru import Labguru, Session, UnAuthorizeException, NotFoundException, Project
+from labguru import Labguru, Session, UnAuthorizeException, Project
+from labguru.exception import NotFoundException
 
 
 def get_token():
     lab = Labguru(login='xtutran@gmail.com', password='Password123')
     return lab
 
-
-def create_project(lab, title, description=None):
-    if lab:
-        return lab.create_new_project(title, description)
-
-
-def get_project(lab, project_id):
-    if lab:
-        project = lab.get_project(project_id)
-        return project
-
-
-def get_all_projects(lab, page):
-    if lab:
-        return lab.get_all_projects(page)
-
-
 def main():
     lab = get_token()
     print(lab.session.token)
 
-    # print(create_project(lab, 'Create_Project_From_Python_Package', 'Testing'))
-
-    projects = get_all_projects(lab, 1)
+    projects = lab.get_all_projects(page_num=1)
     for proj in projects:
-        if proj.id == 111:
-            print(proj.create_new_folder(lab.session.token))
+        # print(proj)
+        if proj.id == 141:
+            print(proj)
+            print(proj.create_new_folder('New Folder 2'))
 
 if __name__ == '__main__':
     main()

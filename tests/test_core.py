@@ -1,6 +1,7 @@
 # tests/test_core.py
 
-from labguru import Labguru, Session, UnAuthorizeException, NotFoundException, Project
+from labguru import Labguru, Session, UnAuthorizeException, Project
+from labguru.exception import NotFoundException
 import pytest
 import vcr
 
@@ -17,25 +18,23 @@ def valid_labguru_session():
 
 @pytest.fixture
 def project_101():
-    return Project(
-        **{
-            "id": 101,
-            "uuid": "f6ddee4d-1ea7-47f2-9519-ea6a377ed151",
-            "title": "FtsH function in Chloroplasts",
-            "user": 371,
-            "description": "one of the first widely used E. coli cloning vectors.",
-            "created_at": "2018-07-17",
-            "owner_id": 31,
-            "milestones": [],
-            "comments": [],
-            "experiment_procedures": [],
-            "attachments": [],
-            "archived": False,
-            "api_url": "/api/v1/projects/101",
-            "viewers": [],
-            "owner": {}
-        }
-    )
+    return Project(**{
+        "id": 101,
+        "uuid": "f6ddee4d-1ea7-47f2-9519-ea6a377ed151",
+        "title": "FtsH function in Chloroplasts",
+        "user": 371,
+        "description": "one of the first widely used E. coli cloning vectors.",
+        "created_at": "2018-07-17",
+        "owner_id": 31,
+        "milestones": [],
+        "comments": [],
+        "experiment_procedures": [],
+        "attachments": [],
+        "archived": False,
+        "api_url": "/api/v1/projects/101",
+        "viewers": [],
+        "owner": {}
+    })
 
 
 @vcr.use_cassette('tests/vcr_cassettes/labguru-session.yml')

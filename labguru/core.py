@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from requests import HTTPError
-from project import Project
-import api
+
 import json
+
+from requests import HTTPError
+
+import api
+from exception import UnAuthorizeException, NotFoundException, DuplicatedException
+from project import Project
+from folder import Folder
 
 
 class Labguru(object):
@@ -23,19 +28,21 @@ class Labguru(object):
 
     def create_new_project(self, title, description=None):
         url = api.normalise('/api/v1/projects.json')
-        item = Project(title, description)
+        item = Project(title=title, description=description)
 
         assert isinstance(title, str) and len(title) > 0, 'title is required to create a new project'
 
+        print(item.to_dict())
         data = {
             'token': self.session.token,
-            'item': item.__dict__
+            'item': item.to_dict()
         }
-        try:
-            response = api.request(url, data=data)
-            return Project(**response)
-        except HTTPError:
-            raise DuplicatedException('Duplicated title: {title} in the lab'.format(title=title))
+        # try:
+        response = api.request(url, data=data)
+        print(response)
+        return Project(**response)
+        # except HTTPError:
+        #     raise DuplicatedException('Duplicated title: {title} in the lab'.format(title=title))
 
     def get_project(self, project_id):
         url = api.normalise('/api/v1/projects/{id}.json'.format(id=project_id))
@@ -44,7 +51,7 @@ class Labguru(object):
         }
         try:
             response = api.request(url, method='GET', data=params)
-            return Project(**response)
+            return Project(token=self.session.token, **response)
         except HTTPError:
             raise NotFoundException('Project {id} does not exist'.format(id=project_id))
 
@@ -56,7 +63,30 @@ class Labguru(object):
         }
         response = api.request(url, method='GET', data=params)
         if isinstance(response, list):
-            return [Project(**item) for item in response]
+            return [Project(token=self.session.token, **item) for item in response]
+        else:
+            return []
+
+    def get_folder(self, folder_id):
+        url = api.normalise('/api/v1/milestones/{id}.json'.format(id=folder_id))
+        params = {
+            'token': self.session.token
+        }
+        try:
+            response = api.request(url, method='GET', data=params)
+            return Folder(**response)
+        except HTTPError:
+            raise NotFoundException('Folder {id} does not exist'.format(id=folder_id))
+
+    def get_all_folders(self, page_num):
+        url = api.normalise('/api/v1/milestones.json')
+        params = {
+            'token': self.session.token,
+            'page': page_num
+        }
+        response = api.request(url, method='GET', data=params)
+        if isinstance(response, list):
+            return [Folder(**item) for item in response]
         else:
             return []
 
@@ -70,15 +100,3 @@ class Session(object):
 
     def __str__(self):
         return json.dumps(self.__dict__)
-
-
-class UnAuthorizeException(Exception):
-    pass
-
-
-class NotFoundException(Exception):
-    pass
-
-
-class DuplicatedException(Exception):
-    pass

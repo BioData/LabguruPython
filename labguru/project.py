@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from requests import HTTPError
+from folder import Folder
+from exception import *
 import json
 import api
 
@@ -25,24 +27,52 @@ import api
 
 
 class Project(object):
-    def __init__(self, title, id=None, description=None, *args, **kwargs):
+    def __init__(self, title, id=None, description=None, milestones=None, token=None, *args, **kwargs):
         self.title = title
         self.id = id
         self.description = description
+        self.milestones = milestones
+        self.token = token
         # self.orders = orders
+
+    def to_dict(self):
+        return dict(filter(lambda x: x[1] is not None, self.__dict__.items()))
 
     def __str__(self):
         return json.dumps(self.__dict__)
 
-    def create_new_folder(self, token, description=None):
+    def create_new_folder(self, title, description=None):
         url = api.normalise('/api/v1/milestones.json')
         data = {
-            'token': token,
+            'token': self.token,
             'item': {
                 "project_id": self.id,
                 "owner_id": 1,
-                "title": self.title,
+                "title": title,
                 "description": description
             }
         }
-        return api.request(url, data=data)
+        response = api.request(url, data=data)
+        return Folder(**response)
+
+    def __get_folders(self, period):
+        url = api.normalise('/api/v1/milestones.json')
+        params = {
+            'token': self.token,
+            'project_id': self.id,
+            'period': period
+        }
+        response = api.request(url, method='GET', data=params)
+        if isinstance(response, list):
+            return [Folder(**item) for item in response]
+        else:
+            return []
+
+    def get_current_folders(self):
+        self.__get_folders('current_milestones')
+
+    def get_future_folders(self):
+        self.__get_folders('future_milestones')
+
+    def get_past_folders(self):
+        self.__get_folders('last_milestones')
