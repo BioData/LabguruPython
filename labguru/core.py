@@ -74,7 +74,7 @@ class Labguru(object):
         }
         try:
             response = api.request(url, method='GET', data=params)
-            return Folder(**response)
+            return Folder(token=self.session.token, **response)
         except HTTPError:
             raise NotFoundException('Folder {id} does not exist'.format(id=folder_id))
 
@@ -86,7 +86,7 @@ class Labguru(object):
         }
         response = api.request(url, method='GET', data=params)
         if isinstance(response, list):
-            return [Folder(**item) for item in response]
+            return [Folder(token=self.session.token, **item) for item in response]
         else:
             return []
 

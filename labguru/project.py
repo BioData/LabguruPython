@@ -53,7 +53,7 @@ class Project(object):
             }
         }
         response = api.request(url, data=data)
-        return Folder(**response)
+        return Folder(token=self.token, **response)
 
     def __get_folders(self, period):
         url = api.normalise('/api/v1/milestones.json')
@@ -63,16 +63,16 @@ class Project(object):
             'period': period
         }
         response = api.request(url, method='GET', data=params)
-        if isinstance(response, list):
-            return [Folder(**item) for item in response]
+        if isinstance(response, list) and len(response) > 0:
+            return [Folder(project_id=self.id, token=self.token, **item) for item in response]
         else:
             return []
 
     def get_current_folders(self):
-        self.__get_folders('current_milestones')
+        return self.__get_folders('current_milestones')
 
     def get_future_folders(self):
-        self.__get_folders('future_milestones')
+        return self.__get_folders('future_milestones')
 
     def get_past_folders(self):
-        self.__get_folders('last_milestones')
+        return self.__get_folders('last_milestones')
