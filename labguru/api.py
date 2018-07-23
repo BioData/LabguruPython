@@ -9,6 +9,7 @@ except ImportError as err:
 
 request_method = {
     'POST': (requests.post, 'json'),
+    'PUT': (requests.put, 'json'),
     'GET': (requests.get, 'data')
 }
 
@@ -25,7 +26,7 @@ def normalise(path, base='https://jonathan.labguru.com'):
 
 
 def request(url, method='POST', headers=None, auth=None, data=None):
-
+    print(data)
     http_method, param = request_method[method]
     response = http_method(url=url, headers=headers, auth=auth, **{param: data})
     response.raise_for_status()
@@ -35,3 +36,10 @@ def request(url, method='POST', headers=None, auth=None, data=None):
         return json_data
     except ValueError:
         raise
+
+
+def call(token, endpoint, method, *args, **kwargs):
+    url = normalise(endpoint)
+    kwargs['token'] = token
+    return request(url, method=method, data=kwargs)
+

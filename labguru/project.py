@@ -41,7 +41,7 @@ class Project(object):
     def __str__(self):
         return json.dumps(self.__dict__)
 
-    def create_new_folder(self, title, description=None):
+    def add_folder(self, title, description=None):
         url = api.normalise('/api/v1/milestones.json')
         data = {
             'token': self.token,
