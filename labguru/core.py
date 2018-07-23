@@ -55,7 +55,7 @@ class Labguru(object):
         except HTTPError:
             raise NotFoundException('Project {id} does not exist'.format(id=project_id))
 
-    def get_all_projects(self, page_num):
+    def list_projects(self, page_num):
         url = api.normalise('/api/v1/projects.json')
         params = {
             'token': self.session.token,
@@ -78,7 +78,7 @@ class Labguru(object):
         except HTTPError:
             raise NotFoundException('Folder {id} does not exist'.format(id=folder_id))
 
-    def get_all_folders(self, page_num):
+    def list_folders(self, page_num):
         url = api.normalise('/api/v1/milestones.json')
         params = {
             'token': self.session.token,

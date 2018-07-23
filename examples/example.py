@@ -11,7 +11,7 @@ def main():
     lab = get_token()
     print(lab.session.token)
 
-    projects = lab.get_all_projects(page_num=1)
+    projects = lab.list_projects(page_num=1)
     for proj in projects:
         # print(proj)
         if proj.id == 141:
@@ -29,7 +29,7 @@ def main():
 
     # print(lab.get_folder(folder_id='41'))
     #
-    # for folder in lab.get_all_folders(page_num=1):
+    # for folder in lab.list_folders(page_num=1):
     #     print(folder)
 
 if __name__ == '__main__':
