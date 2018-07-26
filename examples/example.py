@@ -12,10 +12,20 @@ def main():
     print(lab.session.token)
 
     # print(lab.add_project(title='new add project'))
-    lab.update_project(project_id='20333', title='Update title for 201', description='Update description for 201')
+    # lab.update_project(project_id='20333', title='Update title for 201', description='Update description for 201')
 
-    for proj in lab.list_projects(page_num=1):
-        print(proj)
+    # for proj in lab.list_projects(page_num=1):
+    #     print(proj)
+
+    proj141 = lab.get_project(project_id='141')
+    # for folder in proj141.list_folders():
+    #     print(folder)
+
+    folder251 = lab.get_folder(folder_id='251')
+    b = folder251.add_experiment(title="exp 2")
+
+    print(b)
+
 
     # projects = lab.list_projects(page_num=1)
     # for proj in projects:

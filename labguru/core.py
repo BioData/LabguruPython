@@ -9,6 +9,7 @@ import api
 from exception import UnAuthorizeException, NotFoundException, DuplicatedException
 from project import Project
 from folder import Folder
+from pojo import Session
 
 
 class Labguru(object):
@@ -94,12 +95,4 @@ class Labguru(object):
             return []
 
 
-class Session(object):
-    def __init__(self, token, url, admin, orders, *args, **kwargs):
-        self.token = token
-        self.url = url
-        self.admin = admin
-        self.orders = orders
 
-    def __str__(self):
-        return json.dumps(self.__dict__)

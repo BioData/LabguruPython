@@ -26,7 +26,6 @@ def normalise(path, base='https://jonathan.labguru.com'):
 
 
 def request(url, method='POST', headers=None, auth=None, data=None):
-    print(data)
     http_method, param = request_method[method]
     response = http_method(url=url, headers=headers, auth=auth, **{param: data})
     response.raise_for_status()

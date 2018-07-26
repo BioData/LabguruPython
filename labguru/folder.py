@@ -1,18 +1,33 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from requests import HTTPError
+from pojo import Response
+from experiment import Experiment
 import json
 import api
 
 
-class Folder(object):
-    def __init__(self, title, id=None, project_id=None, description=None, milestones=None, token=None, *args, **kwargs):
+class Folder(Response):
+    def __init__(self, token=None, id=None, title=None, project_id=None, description=None, milestones=None, **kwargs):
+        Response.__init__(self, token, **kwargs)
         self.project_id = project_id
         self.title = title
         self.id = id
         self.description = description
         self.milestones = milestones
-        self.token = token
 
-    def __str__(self):
-        return json.dumps(self.__dict__)
+    def add_experiment(self, title, description=None, step=None):
+        url = api.normalise('/api/v1/experiments.json')
+        data = {
+            'token': self.token,
+            'item': {
+                "project_id": self.project_id,
+                "milestone_id": self.id,
+                "title": title,
+                "description": description,
+                "step": step
+            }
+        }
+        response = api.request(url, data=data)
+
+        return Experiment(token=self.token, project_id=self.project_id, milestone_id=self.id, **response)

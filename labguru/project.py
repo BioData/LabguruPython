@@ -2,6 +2,7 @@
 from __future__ import print_function
 from requests import HTTPError
 from folder import Folder
+from pojo import Response
 from exception import *
 import json
 import api
@@ -26,20 +27,13 @@ import api
 # }
 
 
-class Project(object):
-    def __init__(self, title, id=None, description=None, milestones=None, token=None, *args, **kwargs):
+class Project(Response):
+    def __init__(self, token=None, id=None, title=None, description=None, milestones=None, **kwargs):
+        Response.__init__(self, token, **kwargs)
         self.title = title
         self.id = id
         self.description = description
         self.milestones = milestones
-        self.token = token
-        # self.orders = orders
-
-    def to_dict(self):
-        return dict(filter(lambda x: x[1] is not None, self.__dict__.items()))
-
-    def __str__(self):
-        return json.dumps(self.__dict__)
 
     def add_folder(self, title, description=None):
         url = api.normalise('/api/v1/milestones.json')
@@ -54,6 +48,12 @@ class Project(object):
         }
         response = api.request(url, data=data)
         return Folder(token=self.token, **response)
+
+    def list_folders(self):
+        if self.milestones:
+            return [Folder(project_id=self.id, token=self.token, **milestone) for milestone in self.milestones]
+        else:
+            return []
 
     def __get_folders(self, period):
         url = api.normalise('/api/v1/milestones.json')
