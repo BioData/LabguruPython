@@ -11,20 +11,21 @@ def main():
     lab = get_token()
     print(lab.session.token)
 
-    # print(lab.add_project(title='new add project'))
+    # print(lab.add_project(title='new _add project'))
     # lab.update_project(project_id='20333', title='Update title for 201', description='Update description for 201')
 
     # for proj in lab.list_projects(page_num=1):
     #     print(proj)
 
     proj141 = lab.get_project(project_id='141')
+    print(proj141.add_folder(title='new _add', description='new des'))
     # for folder in proj141.list_folders():
     #     print(folder)
 
-    folder251 = lab.get_folder(folder_id='251')
-    b = folder251.add_experiment(title="exp 2")
+    # folder251 = lab.get_folder(folder_id='251')
+    # b = folder251.add_experiment(title="exp 2")
 
-    print(b)
+    # print(b)
 
 
     # projects = lab.list_projects(page_num=1)

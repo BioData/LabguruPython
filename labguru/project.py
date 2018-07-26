@@ -35,18 +35,11 @@ class Project(Response):
         self.description = description
         self.milestones = milestones
 
-    def add_folder(self, title, description=None):
-        url = api.normalise('/api/v1/milestones.json')
-        data = {
-            'token': self.token,
-            'item': {
-                "project_id": self.id,
-                "owner_id": 1,
-                "title": title,
-                "description": description
-            }
-        }
-        response = api.request(url, data=data)
+    def add_folder(self, title, description=None, **kwargs):
+        response = self._add(endpoint='/api/v1/milestones.json',
+                             project_id=self.id,
+                             title=title,
+                             description=description, **kwargs)
         return Folder(token=self.token, **response)
 
     def list_folders(self):

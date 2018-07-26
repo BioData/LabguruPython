@@ -16,18 +16,12 @@ class Folder(Response):
         self.description = description
         self.milestones = milestones
 
-    def add_experiment(self, title, description=None, step=None):
-        url = api.normalise('/api/v1/experiments.json')
-        data = {
-            'token': self.token,
-            'item': {
-                "project_id": self.project_id,
-                "milestone_id": self.id,
-                "title": title,
-                "description": description,
-                "step": step
-            }
-        }
-        response = api.request(url, data=data)
+    def add_experiment(self, title, description=None, step=None, **kwargs):
+        response = self._add(endpoint='/api/v1/experiments.json',
+                             project_id=self.project_id,
+                             milestone_id=self.id,
+                             title=title,
+                             description=description,
+                             step=step, **kwargs)
 
         return Experiment(token=self.token, project_id=self.project_id, milestone_id=self.id, **response)

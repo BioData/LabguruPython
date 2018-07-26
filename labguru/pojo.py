@@ -1,6 +1,7 @@
 import abc
 import json
 import sys
+import api
 
 
 class Response(object):
@@ -13,6 +14,14 @@ class Response(object):
 
     def to_dict(self):
         return dict(filter(lambda x: x[1] is not None, self.__dict__.items()))
+
+    def _add(self, endpoint, **kwargs):
+        url = api.normalise(endpoint)
+        data = {
+            'token': self.token,
+            'item': kwargs
+        }
+        return api.request(url, data=data)
 
     def __str__(self):
         return json.dumps(self.__dict__)
