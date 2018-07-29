@@ -1,27 +1,38 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from requests import HTTPError
-from pojo import Response
-from experiment import Experiment
-import json
-import api
+
+from project import Project
 
 
-class Folder(Response):
-    def __init__(self, token=None, id=None, title=None, project_id=None, description=None, milestones=None, **kwargs):
-        Response.__init__(self, token, **kwargs)
+class Folder(Project):
+    def __init__(self, token=None, id=None, title=None, project_id=None, **kwargs):
+        Project.__init__(self, token, id, title, **kwargs)
         self.project_id = project_id
-        self.title = title
-        self.id = id
-        self.description = description
-        self.milestones = milestones
+        self.endpoint = '/api/v1/milestones.json'
+        self.specific_endpoint = '/api/v1/milestones/{id}.json'
 
-    def add_experiment(self, title, description=None, step=None, **kwargs):
-        response = self._add(endpoint='/api/v1/experiments.json',
-                             project_id=self.project_id,
-                             milestone_id=self.id,
-                             title=title,
-                             description=description,
-                             step=step, **kwargs)
+    def __get_folders(self, period=None):
+        response = self.find(endpoint=self.endpoint, project_id=self.id, period=period)
+        if isinstance(response, list) and len(response) > 0:
+            return [Folder(project_id=self.id, token=self.token, **item) for item in response]
+        else:
+            return []
 
-        return Experiment(token=self.token, project_id=self.project_id, milestone_id=self.id, **response)
+    def get_current_folders(self):
+        return self.__get_folders(period='current_milestones')
+
+    def get_future_folders(self):
+        return self.__get_folders(period='future_milestones')
+
+    def get_past_folders(self):
+        return self.__get_folders(period='last_milestones')
+
+    # def add_experiment(self, title, description=None, step=None, **kwargs):
+    #     response = self._add(endpoint='/api/v1/experiments.json',
+    #                          project_id=self.project_id,
+    #                          milestone_id=self.id,
+    #                          title=title,
+    #                          description=description,
+    #                          step=step, **kwargs)
+    #
+    #     return Experiment(token=self.token, project_id=self.project_id, milestone_id=self.id, **response)

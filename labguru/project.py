@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from requests import HTTPError
-from folder import Folder
 from pojo import Response
 from exception import *
 import json
@@ -28,44 +27,70 @@ import api
 
 
 class Project(Response):
-    def __init__(self, token=None, id=None, title=None, description=None, milestones=None, **kwargs):
+    def __init__(self, token=None, id=None, title=None, **kwargs):
         Response.__init__(self, token, **kwargs)
         self.title = title
         self.id = id
-        self.description = description
-        self.milestones = milestones
+        # self.description = description
+        # self.milestones = milestones
+        self.endpoint = '/api/v1/projects.json'
+        self.specific_endpoint = '/api/v1/projects/{id}.json'
 
-    def add_folder(self, title, description=None, **kwargs):
-        response = self._add(endpoint='/api/v1/milestones.json',
-                             project_id=self.id,
-                             title=title,
-                             description=description, **kwargs)
-        return Folder(token=self.token, **response)
+    def register(self):
+        response = self._add(endpoint=self.endpoint, item=self.to_dict())
+        return self.__class__(token=self.token, **response)
 
-    def list_folders(self):
-        if self.milestones:
-            return [Folder(project_id=self.id, token=self.token, **milestone) for milestone in self.milestones]
+    def get(self):
+        response = self._get_or_update(endpoint=self.specific_endpoint, id=self.id, method='GET')
+        return self.__class__(token=self.token, **response)
+
+    def list(self, name=None, page_num=None):
+
+        response = self.find(endpoint=self.endpoint, name=name, page_num=page_num)
+        if isinstance(response, list):
+            return [self.__class__(token=self.token, **item) for item in response]
         else:
             return []
 
-    def __get_folders(self, period):
-        url = api.normalise('/api/v1/milestones.json')
-        params = {
-            'token': self.token,
-            'project_id': self.id,
-            'period': period
-        }
-        response = api.request(url, method='GET', data=params)
-        if isinstance(response, list) and len(response) > 0:
-            return [Folder(project_id=self.id, token=self.token, **item) for item in response]
-        else:
-            return []
+    def update(self):
+        response = self._get_or_update(endpoint=self.specific_endpoint, id=self.id, method='PUT', item=self.to_dict())
+        return self.__class__(token=self.token, **response)
 
-    def get_current_folders(self):
-        return self.__get_folders('current_milestones')
+    # def milestones(self):
+    #     if self.milestones:
+    #         return [Folder(project_id=self.id, token=self.token, **milestone) for milestone in self.milestones]
+    #     else:
+    #         return []
 
-    def get_future_folders(self):
-        return self.__get_folders('future_milestones')
-
-    def get_past_folders(self):
-        return self.__get_folders('last_milestones')
+    # def add_folder(self, title, description=None, **kwargs):
+    #     response = self._add(endpoint='/api/v1/milestones.json',
+    #                          project_id=self.id,
+    #                          title=title,
+    #                          description=description, **kwargs)
+    #     return Folder(token=self.token, **response)
+    #
+    # def get_folder(self, folder_id):
+    #     response = self._get_or_update(endpoint='/api/v1/milestones/{id}.json', id=folder_id, method='GET')
+    #     return Folder(token=self.token, project_id=self.id, **response)
+    #
+    # def __get_folders(self, period=None, page_num=None):
+    #     response = self.find(endpoint='/api/v1/milestones.json',
+    #                          project_id=self.id,
+    #                          period=period,
+    #                          page_num=page_num)
+    #     if isinstance(response, list) and len(response) > 0:
+    #         return [Folder(project_id=self.id, token=self.token, **item) for item in response]
+    #     else:
+    #         return []
+    #
+    # def list_folders(self, page_num):
+    #     return self.__get_folders(page_num=page_num)
+    #
+    # def get_current_folders(self):
+    #     return self.__get_folders(period='current_milestones')
+    #
+    # def get_future_folders(self):
+    #     return self.__get_folders(period='future_milestones')
+    #
+    # def get_past_folders(self):
+    #     return self.__get_folders(period='last_milestones')

@@ -32,7 +32,7 @@ def request(url, method='POST', headers=None, auth=None, data=None):
     try:
         json_data = response.json()
 
-        assert isinstance(json_data, dict)
+        assert isinstance(json_data, (dict, list))
         return json_data
     except ValueError:
         raise

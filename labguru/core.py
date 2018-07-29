@@ -9,6 +9,7 @@ import api
 from exception import UnAuthorizeException, NotFoundException, DuplicatedException
 from project import Project
 from folder import Folder
+from experiment import Experiment
 from pojo import Session
 
 
@@ -27,72 +28,79 @@ class Labguru(object):
         else:
             self.session = Session(**response)
 
-    def __project_api(self, endpoint='/api/v1/projects.json', method='GET', *args, **kwargs):
-        return api.call(token=self.session.token, endpoint=endpoint, method=method, data=kwargs)
-
+    """
+    Project API
+    """
     def add_project(self, title, description=None):
         assert isinstance(title, str) and len(title) > 0, 'title is required to create a new project'
 
-        item = Project(title=title, description=description)
-        response = self.__project_api(method='POST', item=item.to_dict())
-        return Project(**response)
+        return Project(token=self.session.token, title=title, description=description).register()
 
     def get_project(self, project_id):
-        endpoint = '/api/v1/projects/{id}.json'.format(id=project_id)
-        try:
-            response = self.__project_api(endpoint, method='GET', id=project_id)
-            return Project(token=self.session.token, **response)
-        except HTTPError:
-            raise NotFoundException('Project {id} does not exist'.format(id=project_id))
+        proj = Project(id=project_id, token=self.session.token)
+        return proj.get()
 
     def find_project(self, name):
-        response = self.__project_api(name=name)
-        if isinstance(response, list):
-            return [Project(token=self.session.token, **item) for item in response]
-        else:
-            return []
+        return Project(token=self.session.token).list(name=name)
 
     def update_project(self, project_id, title, description=None):
-        endpoint = '/api/v1/projects/{id}.json'.format(id=project_id)
-        item = Project(title=title, description=description)
-        try:
-            response = self.__project_api(endpoint, method='PUT', item=item.to_dict())
-            return Project(token=self.session.token, **response)
-        except HTTPError:
-            raise NotFoundException('Project {id} does not exist'.format(id=project_id))
+        proj = Project(token=self.session.token, id=project_id, title=title, description=description)
+        return proj.update()
 
     def archive_project(self):
         pass
 
     def list_projects(self, page_num):
-        response = self.__project_api(page=page_num)
-        if isinstance(response, list):
-            return [Project(token=self.session.token, **item) for item in response]
-        else:
-            return []
+        return Project(token=self.session.token).list(page_num=page_num)
+
+    """
+    Folder API
+    """
+    def add_folder(self, project_id, title, description=None):
+        return Folder(token=self.session.token, project_id=project_id, title=title, description=description).register()
 
     def get_folder(self, folder_id):
-        url = api.normalise('/api/v1/milestones/{id}.json'.format(id=folder_id))
-        params = {
-            'token': self.session.token
-        }
-        try:
-            response = api.request(url, method='GET', data=params)
-            return Folder(token=self.session.token, **response)
-        except HTTPError:
-            raise NotFoundException('Folder {id} does not exist'.format(id=folder_id))
+        return Folder(token=self.session.token, id=folder_id).get()
 
-    def list_folders(self, page_num):
-        url = api.normalise('/api/v1/milestones.json')
-        params = {
-            'token': self.session.token,
-            'page': page_num
-        }
-        response = api.request(url, method='GET', data=params)
-        if isinstance(response, list):
-            return [Folder(token=self.session.token, **item) for item in response]
+    def find_folder(self, name):
+        return Folder(token=self.session.token).list(name=name)
+
+    def update_folder(self, folder_id, title, description=None):
+        return Folder(token=self.session.token, id=folder_id, title=title, description=description).update()
+
+    def list_folders(self, project_id=None, page_num=None):
+        if project_id is not None:
+            milestones = self.get_project(project_id=project_id).milestones
+            assert isinstance(milestones, list)
+            return [Folder(token=self.session.token, project_id=project_id, **milestone) for milestone in milestones]
+        elif page_num is not None:
+            return Folder(token=self.session.token).list(page_num=page_num)
         else:
-            return []
+            raise ValueError('Either project_id or page_num must be specified')
 
+    """
+    Experiment API
+    """
+    def add_experiment(self, project_id, folder_id, title, description=None):
+        return Experiment(token=self.session.token, project_id=project_id, milestone_id=folder_id,
+                          title=title, description=description).register()
 
+    def get_experiment(self, experiment_id):
+        return Experiment(token=self.session.token, id=experiment_id).get()
 
+    def find_experiment(self, name):
+        return Experiment(token=self.session.token).list(name=name)
+
+    def update_experiment(self, experiment_id, title, description=None):
+        return Experiment(token=self.session.token, id=experiment_id, title=title, description=description).update()
+
+    def list_experiments(self, folder_id=None, page_num=None):
+        if folder_id is not None:
+            experiments = self.get_folder(folder_id=folder_id).experiments
+            assert isinstance(experiments, list)
+            return [Experiment(token=self.session.token, milestone_id=folder_id, **experiment)
+                    for experiment in experiments]
+        elif page_num is not None:
+            return Experiment(token=self.session.token).list(page_num=page_num)
+        else:
+            raise ValueError('Either project_id or page_num must be specified')
