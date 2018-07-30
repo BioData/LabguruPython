@@ -8,5 +8,3 @@ class Experiment(Project):
         self.milestone_id = milestone_id
         self.endpoint = '/api/v1/experiments.json'
         self.specific_endpoint = '/api/v1/experiments/{id}.json'
-
-

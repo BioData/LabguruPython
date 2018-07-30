@@ -26,13 +26,3 @@ class Folder(Project):
 
     def get_past_folders(self):
         return self.__get_folders(period='last_milestones')
-
-    # def add_experiment(self, title, description=None, step=None, **kwargs):
-    #     response = self._add(endpoint='/api/v1/experiments.json',
-    #                          project_id=self.project_id,
-    #                          milestone_id=self.id,
-    #                          title=title,
-    #                          description=description,
-    #                          step=step, **kwargs)
-    #
-    #     return Experiment(token=self.token, project_id=self.project_id, milestone_id=self.id, **response)
