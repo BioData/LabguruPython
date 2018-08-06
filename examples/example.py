@@ -37,8 +37,12 @@ def main():
 
     print(lab.get_section(section_id='1'))
 
+    lab.add_element(section_id='1', name='<p>hello world</p>')
+
     for section in lab.list_sections(experiment_id='1'):
         print(section)
+
+    print(lab.get_element(element_id='1601'))
 
     # print(lab.get_folder(folder_id='291'))
 

@@ -9,7 +9,7 @@ import api
 from exception import UnAuthorizeException, NotFoundException, DuplicatedException
 from project import Project
 from folder import Folder
-from experiment import Experiment, Section
+from experiment import Experiment, Section, Element
 from pojo import Session
 
 
@@ -108,8 +108,8 @@ class Labguru(object):
     """
     Section (ExperimentProcedure / ElementContainer)
     """
-    def add_section(self, experiment_id, name, section_type, container_type='Projects::Experiment', member_id='1',
-                    owner_id=1, **kwargs):
+    def add_section(self, experiment_id, name, section_type='text', container_type='Projects::Experiment',
+                    member_id='1', owner_id=1, **kwargs):
         return Section(token=self.session.token,
                        container_id=experiment_id,
                        name=name,
@@ -135,5 +135,35 @@ class Labguru(object):
                     for experiment in experiment_procedures]
         elif page_num is not None:
             return Section(token=self.session.token).list(page_num=page_num)
+        else:
+            raise ValueError('Either experiment_id or page_num must be specified')
+
+    """
+    Element API
+    """
+    def add_element(self, section_id, data, element_type='text', container_type='ExperimentProcedure', **kwargs):
+        return Element(token=self.session.token,
+                       container_id=section_id,
+                       data=data,
+                       element_type=element_type,
+                       container_type=container_type, **kwargs).register()
+
+    def find_element(self, name):
+        return Element(token=self.session.token).list(name=name)
+
+    def get_element(self, element_id):
+        return Element(token=self.session.token, id=element_id).get()
+
+    def update_element(self, element_id, name, **kwargs):
+        return Element(token=self.session.token, id=element_id, name=name, **kwargs).update()
+
+    def list_elements(self, section_id=None, page_num=None):
+        if section_id is not None:
+            elements = self.get_section(section_id=section_id).elements
+            assert isinstance(elements, list)
+            return [Element(token=self.session.token, container_id=section_id, **element)
+                    for element in elements]
+        elif page_num is not None:
+            return Element(token=self.session.token).list(page_num=page_num)
         else:
             raise ValueError('Either experiment_id or page_num must be specified')

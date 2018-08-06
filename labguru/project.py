@@ -37,7 +37,6 @@ class Project(Response):
         self.specific_endpoint = '/api/v1/projects/{id}.json'
 
     def register(self):
-        print(self.to_dict())
         response = self._add(endpoint=self.endpoint, item=self.to_dict())
         return self.__class__(token=self.token, **response)
 
