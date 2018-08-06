@@ -14,11 +14,11 @@ def main():
     # print(prj)
     # print(lab.update_project(project_id=prj.id, title='Update title for 201', description='Update description for 201'))
     #
-    for proj in lab.list_projects(page_num=1):
-        print(proj)
-
-    proj141 = lab.get_project(project_id='141')
-    print(proj141.id)
+    # for proj in lab.list_projects(page_num=1):
+    #     print(proj)
+    #
+    # proj141 = lab.get_project(project_id='141')
+    # print(proj141.id)
 
     # for folder in lab.list_folders(page_num=1):
     #     print(folder)
@@ -27,10 +27,18 @@ def main():
     # for folder in lab.list_folders(project_id='141', page_num=1):
     #     print(folder)
 
-    # for exp in lab.list_experiments(page_num=1):
-    #     print(exp)
+    for exp in lab.list_experiments(page_num=1):
+        print(exp.id)
+
+    # print(lab.get_experiment(experiment_id='141'))
+    # lab.add_section(experiment_id='1', name='Tran add section')
 
     print(lab.get_experiment(experiment_id='1'))
+
+    print(lab.get_section(section_id='1'))
+
+    for section in lab.list_sections(experiment_id='1'):
+        print(section)
 
     # print(lab.get_folder(folder_id='291'))
 

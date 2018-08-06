@@ -9,7 +9,7 @@ import api
 from exception import UnAuthorizeException, NotFoundException, DuplicatedException
 from project import Project
 from folder import Folder
-from experiment import Experiment
+from experiment import Experiment, Section
 from pojo import Session
 
 
@@ -103,4 +103,37 @@ class Labguru(object):
         elif page_num is not None:
             return Experiment(token=self.session.token).list(page_num=page_num)
         else:
-            raise ValueError('Either project_id or page_num must be specified')
+            raise ValueError('Either folder_id or page_num must be specified')
+
+    """
+    Section (ExperimentProcedure / ElementContainer)
+    """
+    def add_section(self, experiment_id, name, section_type, container_type='Projects::Experiment', member_id='1',
+                    owner_id=1, **kwargs):
+        return Section(token=self.session.token,
+                       container_id=experiment_id,
+                       name=name,
+                       section_type=section_type,
+                       container_type=container_type,
+                       member_id=member_id,
+                       owner_id=owner_id, **kwargs).register()
+
+    def find_section(self, name):
+        return Section(token=self.session.token).list(name=name)
+
+    def get_section(self, section_id):
+        return Section(token=self.session.token, id=section_id).get()
+
+    def update_section(self, section_id, name, **kwargs):
+        return Section(token=self.session.token, id=section_id, name=name, **kwargs).update()
+
+    def list_sections(self, experiment_id=None, page_num=None):
+        if experiment_id is not None:
+            experiment_procedures = self.get_experiment(experiment_id=experiment_id).experiment_procedures
+            assert isinstance(experiment_procedures, list)
+            return [Section(token=self.session.token, container_id=experiment_id, **experiment['experiment_procedure'])
+                    for experiment in experiment_procedures]
+        elif page_num is not None:
+            return Section(token=self.session.token).list(page_num=page_num)
+        else:
+            raise ValueError('Either experiment_id or page_num must be specified')
