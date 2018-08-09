@@ -12,7 +12,8 @@ This project is a Python wrapper of Labguru API
 You can install LabguruPython from github with:
 
 
-``` sh
+```
+
 # clone repo
 git clone https://github.com/BioData/LabguruPython.git
 
