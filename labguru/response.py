@@ -3,7 +3,7 @@ import json
 import sys
 from . import api
 from requests import HTTPError
-from .exception import UnAuthorizeException, NotFoundException, DuplicatedException
+from .error import UnAuthorizeException, NotFoundException, DuplicatedException
 
 
 def filter_none(d):

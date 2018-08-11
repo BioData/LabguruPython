@@ -1,27 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from .pojo import Response
+from .response import Response
 
 
-# {
-# "id": 101,
-# "uuid": "f6ddee4d-1ea7-47f2-9519-ea6a377ed151",
-# "title": "FtsH function in Chloroplasts",
-# "user": 371,
-# "description": "one of the first widely used E. coli cloning vectors.",
-# "created_at": "2018-07-17",
-# "owner_id": 31,
-# "milestones": [],
-# "comments": [],
-# "experiment_procedures": [],
-# "attachments": [],
-# "archived": false,
-# "api_url": "/api/v1/projects/101",
-# "viewers": [],
-# "owner": {...}
-# }
-
-
+# Level 1
 class Project(Response):
     def __init__(self, token=None, id=None, title=None, **kwargs):
         Response.__init__(self, token, **kwargs)
@@ -51,3 +33,64 @@ class Project(Response):
     def update(self):
         response = self._get_or_update(endpoint=self.specific_endpoint, id=self.id, method='PUT', item=self.to_dict())
         return self.__class__(token=self.token, **response)
+
+
+# Level 2
+class Folder(Project):
+    def __init__(self, token=None, id=None, title=None, project_id=None, **kwargs):
+        Project.__init__(self, token, id, title, **kwargs)
+        self.project_id = project_id
+        self.endpoint = '/api/v1/milestones.json'
+        self.specific_endpoint = '/api/v1/milestones/{id}.json'
+
+    def __get_folders(self, period=None):
+        response = self.find(endpoint=self.endpoint, project_id=self.id, period=period)
+        if isinstance(response, list) and len(response) > 0:
+            return [Folder(project_id=self.id, token=self.token, **item) for item in response]
+        else:
+            return []
+
+    def get_current_folders(self):
+        return self.__get_folders(period='current_milestones')
+
+    def get_future_folders(self):
+        return self.__get_folders(period='future_milestones')
+
+    def get_past_folders(self):
+        return self.__get_folders(period='last_milestones')
+
+
+# Level 2.1
+class Experiment(Project):
+    def __init__(self, token=None, project_id=None, milestone_id=None, id=None, title=None, **kwargs):
+        Project.__init__(self, token, id, title, **kwargs)
+        self.project_id = project_id
+        self.milestone_id = milestone_id
+        self.endpoint = '/api/v1/experiments.json'
+        self.specific_endpoint = '/api/v1/experiments/{id}.json'
+
+
+# Level 2.2
+class Section(Project):
+    def __init__(self, token=None, container_id=None, id=None, name=None, section_type=None, container_type=None,
+                 **kwargs):
+        Project.__init__(self, token, id, **kwargs)
+        self.container_id = container_id
+        self.name = name
+        self.section_type = section_type
+        self.container_type = container_type
+        self.endpoint = '/api/v1/element_containers.json'
+        self.specific_endpoint = '/api/v1/element_containers/{id}.json'
+
+
+# Level 2.3
+class Element(Project):
+    def __init__(self, token=None, container_id=None, id=None, data=None, element_type=None, container_type=None,
+                 **kwargs):
+        Project.__init__(self, token, id, **kwargs)
+        self.container_id = container_id
+        self.data = data
+        self.element_type = element_type
+        self.container_type = container_type
+        self.endpoint = '/api/v1/elements.json'
+        self.specific_endpoint = '/api/v1/elements/{id}.json'

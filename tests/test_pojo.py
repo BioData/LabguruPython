@@ -1,4 +1,4 @@
-from labguru import pojo
+from labguru import response
 
 import pytest
 
@@ -8,5 +8,5 @@ import pytest
     ('0978d492429c3bf824db87f2036ae182994b92ce', 'https://labguru.com/', True, False),
 ])
 def test_response(token, url, admin, orders):
-    res = pojo.Response(token=token, url=url, admin=admin, orders=orders)
+    res = response.Response(token=token, url=url, admin=admin, orders=orders)
     assert res.url == url

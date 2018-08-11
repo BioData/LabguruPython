@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-import json
-
-from requests import HTTPError
-
 from . import api
-from .exception import UnAuthorizeException, NotFoundException, DuplicatedException
-from .project import Project
-from .folder import Folder
-from .experiment import Experiment, Section, Element
-from .pojo import Session
+from .error import UnAuthorizeException
+from .project import Project, Folder, Experiment, Section, Element
+from .response import Session
 
 
 class Labguru(object):
