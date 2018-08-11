@@ -19,9 +19,6 @@ git clone https://github.com/BioData/LabguruPython.git
 
 cd LabguruPython
 
-# install required packages
-pip install -r requirements.tx
-
 # install LabguruPython
 python setup.py install
 
