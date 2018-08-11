@@ -1,9 +1,9 @@
 import abc
 import json
 import sys
-import api
+from . import api
 from requests import HTTPError
-from exception import UnAuthorizeException, NotFoundException, DuplicatedException
+from .exception import UnAuthorizeException, NotFoundException, DuplicatedException
 
 
 def filter_none(d):

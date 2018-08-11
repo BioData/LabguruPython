@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from requests import HTTPError
-from pojo import Response
-from exception import *
-import json
-import api
+from .pojo import Response
 
 
 # {

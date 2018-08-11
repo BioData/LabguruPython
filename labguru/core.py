@@ -5,12 +5,12 @@ import json
 
 from requests import HTTPError
 
-import api
-from exception import UnAuthorizeException, NotFoundException, DuplicatedException
-from project import Project
-from folder import Folder
-from experiment import Experiment, Section, Element
-from pojo import Session
+from . import api
+from .exception import UnAuthorizeException, NotFoundException, DuplicatedException
+from .project import Project
+from .folder import Folder
+from .experiment import Experiment, Section, Element
+from .pojo import Session
 
 
 class Labguru(object):

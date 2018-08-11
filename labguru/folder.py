@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from project import Project
+from .project import Project
 
 
 class Folder(Project):
