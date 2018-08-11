@@ -27,7 +27,7 @@ python setup.py install
 Load LabguruPython
 
 ``` python
-import labguru
+from labguru import Labguru
 ```
 
 # Authenticate
