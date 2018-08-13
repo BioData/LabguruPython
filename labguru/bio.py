@@ -57,3 +57,11 @@ class Antibodies(Project):
         Project.__init__(self, token=token, id=id, title=title, description=description, **kwargs)
         self.endpoint = '/api/v1/antibodies.json'
         self.specific_endpoint = '/api/v1/antibodies/{id}.json'
+
+
+class Bacteria(Project):
+    def __init__(self, token=None, id=None, name=None, description=None, **kwargs):
+        Project.__init__(self, token=token, id=id, description=description, **kwargs)
+        self.name = name
+        self.endpoint = '/api/v1/bacteria.json'
+        self.specific_endpoint = '/api/v1/bacteria/{id}.json'

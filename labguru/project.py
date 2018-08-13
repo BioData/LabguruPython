@@ -71,7 +71,7 @@ class Experiment(Project):
 
 
 # Level 2.2
-class Section(Project):
+class Procedure(Project):
     def __init__(self, token=None, container_id=None, id=None, name=None, section_type=None, container_type=None,
                  **kwargs):
         Project.__init__(self, token, id, **kwargs)

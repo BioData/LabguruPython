@@ -31,15 +31,15 @@ def main():
         print(exp.id)
 
     # print(lab.get_experiment(experiment_id='141'))
-    # lab.add_section(experiment_id='1', name='Tran add section')
+    # lab.add_experiment_procedure(experiment_id='1', name='Tran add section')
 
     print(lab.get_experiment(experiment_id='1'))
 
-    print(lab.get_section(section_id='1'))
+    print(lab.get_experiment_procedure(section_id='1'))
 
     lab.add_element(section_id='1', name='<p>hello world</p>')
 
-    for section in lab.list_sections(experiment_id='1'):
+    for section in lab.list_experiment_procedures(experiment_id='1'):
         print(section)
 
     print(lab.get_element(element_id='1601'))

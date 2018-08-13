@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from . import api
 from .error import UnAuthorizeException
-from .project import Project, Folder, Experiment, Section, Element
+from .project import Project, Folder, Experiment, Procedure, Element
 from .response import Session
 
 
@@ -100,35 +100,35 @@ class Labguru(object):
             raise ValueError('Either folder_id or page_num must be specified')
 
     """
-    Section (ExperimentProcedure / ElementContainer)
+    Procedure (ExperimentProcedure / ElementContainer)
     """
-    def add_section(self, experiment_id, name, section_type='text', container_type='Projects::Experiment',
-                    member_id='1', owner_id=1, **kwargs):
-        return Section(token=self.session.token,
-                       container_id=experiment_id,
-                       name=name,
-                       section_type=section_type,
-                       container_type=container_type,
-                       member_id=member_id,
-                       owner_id=owner_id, **kwargs).register()
+    def add_experiment_procedure(self, experiment_id, name, section_type='text', container_type='Projects::Experiment',
+                                 member_id='1', owner_id=1, **kwargs):
+        return Procedure(token=self.session.token,
+                         container_id=experiment_id,
+                         name=name,
+                         section_type=section_type,
+                         container_type=container_type,
+                         member_id=member_id,
+                         owner_id=owner_id, **kwargs).register()
 
-    def find_section(self, name):
-        return Section(token=self.session.token).list(name=name)
+    def find_experiment_procedure(self, name):
+        return Procedure(token=self.session.token).list(name=name)
 
-    def get_section(self, section_id):
-        return Section(token=self.session.token, id=section_id).get()
+    def get_experiment_procedure(self, section_id):
+        return Procedure(token=self.session.token, id=section_id).get()
 
-    def update_section(self, section_id, name, **kwargs):
-        return Section(token=self.session.token, id=section_id, name=name, **kwargs).update()
+    def update_experiment_procedure(self, section_id, name, **kwargs):
+        return Procedure(token=self.session.token, id=section_id, name=name, **kwargs).update()
 
-    def list_sections(self, experiment_id=None, page_num=None):
+    def list_experiment_procedures(self, experiment_id=None, page_num=None):
         if experiment_id is not None:
             experiment_procedures = self.get_experiment(experiment_id=experiment_id).experiment_procedures
             assert isinstance(experiment_procedures, list)
-            return [Section(token=self.session.token, container_id=experiment_id, **experiment['experiment_procedure'])
+            return [Procedure(token=self.session.token, container_id=experiment_id, **experiment['experiment_procedure'])
                     for experiment in experiment_procedures]
         elif page_num is not None:
-            return Section(token=self.session.token).list(page_num=page_num)
+            return Procedure(token=self.session.token).list(page_num=page_num)
         else:
             raise ValueError('Either experiment_id or page_num must be specified')
 
@@ -153,7 +153,7 @@ class Labguru(object):
 
     def list_elements(self, section_id=None, page_num=None):
         if section_id is not None:
-            elements = self.get_section(section_id=section_id).elements
+            elements = self.get_experiment_procedure(section_id=section_id).elements
             assert isinstance(elements, list)
             return [Element(token=self.session.token, container_id=section_id, **element)
                     for element in elements]
