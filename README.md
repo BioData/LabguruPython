@@ -35,7 +35,7 @@ from labguru import Labguru
 First get an authentication token using labguru_authenticate.
 
 ``` python
-lab = Labguru(login="my@@email.com", password="mypassword")
+lab = Labguru(login="my@email.com", password="mypassword")
 ```
 
 # Experiment
