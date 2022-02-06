@@ -4,6 +4,7 @@ from __future__ import print_function
 from . import api
 from .error import UnAuthorizeException
 from .project import Project, Folder, Experiment, Procedure, Element
+from .inventory import Item, Stock
 from .response import Session
 
 
@@ -149,7 +150,7 @@ class Labguru(object):
         return Element(token=self.session.token, id=element_id).get()
 
     def update_element(self, element_id, name, **kwargs):
-        return Element(token=self.session.token, id=element_id, name=name, **kwargs).update()
+        return Element(token=self.session.token, id=element_id, name=name, **kwargs).update_element()
 
     def list_elements(self, section_id=None, page_num=None):
         if section_id is not None:
@@ -162,3 +163,72 @@ class Labguru(object):
         else:
             raise ValueError('Either experiment_id or page_num must be specified')
 
+    def get_element_by_type(self, experiment_id, element_type):
+        return Element(token=self.session.token, experiment_id=experiment_id, element_type=element_type).list_by_type()
+
+    """
+    Item API
+    """
+    def add_item(self, name, item_type):
+        assert isinstance(name, str) and len(name) > 0, 'title is required to create a new item'
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to create a new item'
+
+        return Item(token=self.session.token, name=name, item_type=item_type).register()
+
+    def get_item(self, item_id, item_type):
+        item = Item(id=item_id, token=self.session.token, item_type=item_type)
+        return item.get()
+
+    def find_item(self, name, item_type):
+        return Item(token=self.session.token, item_type=item_type).list(name=name)
+
+    def update_item(self, item_id, name, item_type, **kwargs):
+        return Item(token=self.session.token, id=item_id, name=name, item_type=item_type, **kwargs).update()
+
+    def list_item(self, item_type, page_num):
+        return Item(token=self.session.token, item_type=item_type).list(page_num=page_num)
+
+    """
+    Generic Item API
+    """
+    def add_generic_item(self, name, item_type):
+        assert isinstance(name, str) and len(name) > 0, 'title is required to create a new item'
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to create a new item'
+
+        return Item(token=self.session.token, name=name, item_type=f'biocollections/{item_type}').register()
+
+    def get_generic_item(self, item_id, item_type):
+        item = Item(id=item_id, token=self.session.token, item_type=f'biocollections/{item_type}')
+        return item.get()
+
+    def find_generic_item(self, name, item_type):
+        return Item(token=self.session.token, item_type=f'biocollections/{item_type}').list(name=name)
+
+    def update_generic_item(self, item_id, name, item_type, **kwargs):
+        return Item(token=self.session.token, id=item_id, name=name, item_type=f'biocollections/{item_type}', **kwargs).update()
+
+    def list_generic_item(self, item_type, page_num):
+        return Item(token=self.session.token, item_type=f'biocollections/{item_type}').list(page_num=page_num)
+
+    """
+    Stock API
+    """
+    def add_stock(self, stock_name, storage_id, storage_type, stockable_type, stockable_id, **kwargs):
+        return Stock(token=self.session.token,
+                       name=stock_name,
+                       storage_id=storage_id,
+                       storage_type=storage_type,
+                       stockable_type=stockable_type,
+                       stockable_id=stockable_id, **kwargs).register()
+
+    def find_stock(self, name):
+        return Stock(token=self.session.token).list(name=name)
+
+    def get_stock(self, element_id):
+        return Stock(token=self.session.token, id=element_id).get()
+
+    def update_stock(self, stock_id, **kwargs):
+        return Stock(token=self.session.token, id=stock_id, **kwargs).update()
+
+    def list_stocks(self, page_num):
+        return Stock(token=self.session.token).list(page_num=page_num)

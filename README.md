@@ -186,8 +186,110 @@ print(experiment_update.id, experiment_update.title)
 
 ## Experiment procedures
 
-Update soon
+Add section to experiment
+
+``` python
+section = lab.add_experiment_procedure(experiment_id=817, name='test1')
+
+print(section)
+```
+
+Find section
+
+``` python
+section = lab.find_experiment_procedure(name='test1')
+
+print(section)
+```
+
+Get section
+
+``` python
+section = lab.get_experiment_procedure(section_id=5514)
+
+print(section)
+```
+
+Update section
+
+``` python
+section = lab.update_experiment_procedure(section_id=5514, name='new name')
+
+print(section)
+```
+
+List sections
+
+``` python
+sections = lab.list_experiment_procedures(experiment_id=817, page_num=1)
+
+print(sections)
+```
 
 ## Elements
 
-Update soon
+Add element to section
+
+``` python
+element = lab.add_element(section_id=5478, data=None, element_type='steps')
+
+print(element)
+```
+
+Get element
+
+``` python
+elements = lab.get_element(element_id='1601')
+
+print(elements)
+```
+
+Update element
+
+``` python
+element = lab.update_element(element_id=8117, name='text element', data='<p> add text </p>')
+
+print(element)
+```
+
+List elements by type
+
+``` python
+elements = lab.get_element_by_type(experiment_id=586, element_type='plate')
+
+print(elements)
+```
+
+## Items
+
+Add item
+
+``` python
+item = lab.add_item(name='cell_line_1', item_type='cell_lines')
+
+print(item)
+```
+
+Get item
+
+``` python
+items = lab.get_item(item_id=329, item_type='cell_lines')
+
+print(items)
+```
+
+Update item
+
+``` python
+item = lab.update_item(item_id=329, item_type='cell_lines', name='new name')
+
+print(item)
+```
+
+List items
+
+``` python
+items = lab.list_item(item_type='cell_lines', page_num=1)
+
+print(items)
+```

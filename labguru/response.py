@@ -28,12 +28,15 @@ class Response(object):
         url = api.normalise(endpoint)
         data = filter_none(kwargs)
         data['token'] = self.token
+
         return api.request(url, data=data)
 
     def _get_or_update(self, endpoint, id, method='GET', **kwargs):
         url = api.normalise(endpoint.format(id=id))
         data = filter_none(kwargs)
         data['token'] = self.token
+        print(url)
+        print(data)
         try:
             return api.request(url, method=method, data=data)
         except HTTPError:
@@ -45,10 +48,22 @@ class Response(object):
         data['token'] = self.token
         return api.request(url, method='GET', data=data)
 
+    def filter(self, endpoint, experiment_id, element_type, method='GET', **kwargs):
+        url = api.normalise(endpoint.format(id=experiment_id, element_type=element_type))
+        data = filter_none(kwargs)
+        data['token'] = self.token
+        try:
+            return api.request(url, method=method, data=data)
+        except HTTPError:
+            raise NotFoundException('{element_type} {experiment_id} does not exist'.format(name=self.__class__,
+                                                                                           experiment_id=experiment_id,
+                                                                                           element_type=element_type))
+
     def __str__(self):
         return json.dumps(self.__dict__)
 
 
 class Session(Response):
-    def __init__(self, token, url, admin, orders,account_id,environment):
-        Response.__init__(self, token=token, url=url, admin=admin, orders=orders, account_id=account_id,environment=environment)
+    def __init__(self, token, url, admin, orders, account_id, environment):
+        Response.__init__(self, token=token, url=url, admin=admin, orders=orders, account_id=account_id,
+                          environment=environment)
