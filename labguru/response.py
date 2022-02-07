@@ -35,8 +35,6 @@ class Response(object):
         url = api.normalise(endpoint.format(id=id))
         data = filter_none(kwargs)
         data['token'] = self.token
-        print(url)
-        print(data)
         try:
             return api.request(url, method=method, data=data)
         except HTTPError:
