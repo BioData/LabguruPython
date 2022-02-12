@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import sys
 from datetime import datetime
 import json
 
@@ -123,6 +124,10 @@ class Element(Project):
 
         elif self.element_type == 'plate':
             return json.loads(self.data).get('wells')
+
+        else:
+            return self.data
+
 
     def update_stock_amount(self, sample_id, stock_id, amount_used, unit_type, unit_type_name):
         if self.element_type == 'samples':

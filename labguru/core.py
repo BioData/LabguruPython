@@ -4,7 +4,7 @@ from __future__ import print_function
 from . import api
 from .error import UnAuthorizeException
 from .project import Project, Folder, Experiment, Procedure, Element
-from .inventory import Item, Stock
+from .inventory import InventoryItem, Stock
 from .response import Session
 
 
@@ -28,18 +28,19 @@ class Labguru(object):
     """
     def add_project(self, title, description=None):
         assert isinstance(title, str) and len(title) > 0, 'title is required to create a new project'
-
         return Project(token=self.session.token, title=title, description=description).register()
 
     def get_project(self, project_id):
+        assert project_id, 'project_id is required to get project'
         proj = Project(id=project_id, token=self.session.token)
         return proj.get()
 
-    def find_project(self, name):
+    def find_projects(self, name):
         return Project(token=self.session.token).list(name=name)
 
-    def update_project(self, project_id, title, description=None):
-        proj = Project(token=self.session.token, id=project_id, title=title, description=description)
+    def update_project(self, project_id, title, description=None, **kwargs):
+        assert project_id, 'project_id is required to update project'
+        proj = Project(token=self.session.token, id=project_id, title=title, description=description, **kwargs)
         return proj.update()
 
     def archive_project(self):
@@ -52,16 +53,20 @@ class Labguru(object):
     Folder API
     """
     def add_folder(self, project_id, title, description=None):
+        assert isinstance(title, str) and len(title) > 0, 'title is required to create a new folder'
+        assert project_id, 'project_id is required to create a new folder'
         return Folder(token=self.session.token, project_id=project_id, title=title, description=description).register()
 
     def get_folder(self, folder_id):
+        assert folder_id, 'folder_id is required to get folder'
         return Folder(token=self.session.token, id=folder_id).get()
 
-    def find_folder(self, name):
+    def find_folders(self, name):
         return Folder(token=self.session.token).list(name=name)
 
-    def update_folder(self, folder_id, title, description=None):
-        return Folder(token=self.session.token, id=folder_id, title=title, description=description).update()
+    def update_folder(self, folder_id, title, description=None, **kwargs):
+        assert folder_id, 'folder_id is required to update project'
+        return Folder(token=self.session.token, id=folder_id, title=title, description=description, **kwargs).update()
 
     def list_folders(self, project_id=None, page_num=None):
         if project_id is not None:
@@ -77,17 +82,23 @@ class Labguru(object):
     Experiment API
     """
     def add_experiment(self, project_id, folder_id, title, description=None):
+        assert isinstance(title, str) and len(title) > 0, 'title is required to create a new experiment'
+        assert project_id, 'project_id is required to create a new experiment'
+        assert folder_id, 'folder_id is required to create a new experiment'
         return Experiment(token=self.session.token, project_id=project_id, milestone_id=folder_id,
                           title=title, description=description).register()
 
     def get_experiment(self, experiment_id):
+        assert experiment_id, 'experiment_id is required to get experiment'
         return Experiment(token=self.session.token, id=experiment_id).get()
 
-    def find_experiment(self, name):
+    def find_experiments(self, name):
         return Experiment(token=self.session.token).list(name=name)
 
-    def update_experiment(self, experiment_id, title, description=None):
-        return Experiment(token=self.session.token, id=experiment_id, title=title, description=description).update()
+    def update_experiment(self, experiment_id, title, description=None, **kwargs):
+        assert experiment_id, 'experiment_id is required to update experiment'
+        return Experiment(token=self.session.token, id=experiment_id, title=title, description=description,
+                          **kwargs).update()
 
     def list_experiments(self, folder_id=None, page_num=None):
         if folder_id is not None:
@@ -103,23 +114,26 @@ class Labguru(object):
     """
     Procedure (ExperimentProcedure / ElementContainer)
     """
-    def add_experiment_procedure(self, experiment_id, name, section_type='text', container_type='Projects::Experiment',
-                                 member_id='1', owner_id=1, **kwargs):
+    def add_experiment_procedure(self, container_id, name, section_type='text', container_type='Projects::Experiment',
+                                 **kwargs):
+        assert isinstance(name, str) and len(name) > 0, 'name is required to create a new section'
+        assert container_id, 'container_id is required to create a new section'
         return Procedure(token=self.session.token,
-                         container_id=experiment_id,
+                         container_id=container_id,
                          name=name,
                          section_type=section_type,
                          container_type=container_type,
-                         member_id=member_id,
-                         owner_id=owner_id, **kwargs).register()
+                         **kwargs).register()
 
-    def find_experiment_procedure(self, name):
+    def find_experiment_procedures(self, name):
         return Procedure(token=self.session.token).list(name=name)
 
     def get_experiment_procedure(self, section_id):
+        assert section_id, 'section_id is required to get section'
         return Procedure(token=self.session.token, id=section_id).get()
 
     def update_experiment_procedure(self, section_id, name, **kwargs):
+        assert section_id, 'section_id is required to update section'
         return Procedure(token=self.session.token, id=section_id, name=name, **kwargs).update()
 
     def list_experiment_procedures(self, experiment_id=None, page_num=None):
@@ -136,20 +150,23 @@ class Labguru(object):
     """
     Element API
     """
-    def add_element(self, section_id, data, element_type='text', container_type='ExperimentProcedure', **kwargs):
+    def add_element(self, section_id, data=None, element_type='text', container_type='ExperimentProcedure', **kwargs):
+        assert section_id, 'section_id is required to add a new element'
         return Element(token=self.session.token,
                        container_id=section_id,
                        data=data,
                        element_type=element_type,
                        container_type=container_type, **kwargs).register()
 
-    def find_element(self, name):
+    def find_elements(self, name):
         return Element(token=self.session.token).list(name=name)
 
     def get_element(self, element_id):
+        assert element_id, 'element_id is required to get element'
         return Element(token=self.session.token, id=element_id).get()
 
     def update_element(self, element_id, name, **kwargs):
+        assert element_id, 'element_id is required to update element'
         return Element(token=self.session.token, id=element_id, name=name, **kwargs).update_element()
 
     def list_elements(self, section_id=None, page_num=None):
@@ -163,57 +180,72 @@ class Labguru(object):
         else:
             raise ValueError('Either experiment_id or page_num must be specified')
 
-    def get_element_by_type(self, experiment_id, element_type):
+    def get_elements_by_type(self, experiment_id, element_type):
+        assert experiment_id, 'experiment_id is required to get elements by type'
         return Element(token=self.session.token, experiment_id=experiment_id, element_type=element_type).list_by_type()
 
     """
-    Item API
+    Inventory Item API
     """
-    def add_item(self, name, item_type):
+    def add_inventory_item(self, name, item_type):
         assert isinstance(name, str) and len(name) > 0, 'title is required to create a new item'
         assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to create a new item'
+        return InventoryItem(token=self.session.token, name=name, item_type=item_type).register()
 
-        return Item(token=self.session.token, name=name, item_type=item_type).register()
-
-    def get_item(self, item_id, item_type):
-        item = Item(id=item_id, token=self.session.token, item_type=item_type)
+    def get_inventory_item(self, item_id, item_type):
+        assert item_id, 'item_id is required to get inventory item'
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to get inventory item'
+        item = InventoryItem(id=item_id, token=self.session.token, item_type=item_type)
         return item.get()
 
-    def find_item(self, name, item_type):
-        return Item(token=self.session.token, item_type=item_type).list(name=name)
+    def find_inventory_items(self, name, item_type):
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to find inventory items'
+        return InventoryItem(token=self.session.token, item_type=item_type).list(name=name)
 
-    def update_item(self, item_id, name, item_type, **kwargs):
-        return Item(token=self.session.token, id=item_id, name=name, item_type=item_type, **kwargs).update()
+    def update_inventory_item(self, item_id, name, item_type, **kwargs):
+        assert item_id, 'item_id is required to update inventory item'
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to update inventory item'
+        return InventoryItem(token=self.session.token, id=item_id, name=name, item_type=item_type, **kwargs).update()
 
-    def list_item(self, item_type, page_num):
-        return Item(token=self.session.token, item_type=item_type).list(page_num=page_num)
+    def list_inventory_items(self, item_type, page_num):
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to list inventory items'
+        return InventoryItem(token=self.session.token, item_type=item_type).list(page_num=page_num)
 
     """
-    Generic Item API
+    Generic Inventory Item API
     """
-    def add_generic_item(self, name, item_type):
+    def add_inventory_generic_item(self, name, item_type):
         assert isinstance(name, str) and len(name) > 0, 'title is required to create a new item'
         assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to create a new item'
+        return InventoryItem(token=self.session.token, name=name, item_type=f'biocollections/{item_type}').register()
 
-        return Item(token=self.session.token, name=name, item_type=f'biocollections/{item_type}').register()
-
-    def get_generic_item(self, item_id, item_type):
-        item = Item(id=item_id, token=self.session.token, item_type=f'biocollections/{item_type}')
+    def get_inventory_generic_item(self, item_id, item_type):
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to get item'
+        item = InventoryItem(id=item_id, token=self.session.token, item_type=f'biocollections/{item_type}')
         return item.get()
 
-    def find_generic_item(self, name, item_type):
-        return Item(token=self.session.token, item_type=f'biocollections/{item_type}').list(name=name)
+    def find_inventory_generic_items(self, name, item_type):
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to find items'
+        return InventoryItem(token=self.session.token, item_type=f'biocollections/{item_type}').list(name=name)
 
-    def update_generic_item(self, item_id, name, item_type, **kwargs):
-        return Item(token=self.session.token, id=item_id, name=name, item_type=f'biocollections/{item_type}', **kwargs).update()
+    def update_inventory_generic_item(self, item_id, name, item_type, **kwargs):
+        assert item_id, 'item_id is required to update inventory item'
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to update item'
+        return InventoryItem(token=self.session.token, id=item_id, name=name, item_type=f'biocollections/{item_type}', **kwargs).update()
 
-    def list_generic_item(self, item_type, page_num):
-        return Item(token=self.session.token, item_type=f'biocollections/{item_type}').list(page_num=page_num)
+    def list_inventory_generic_items(self, item_type, page_num):
+        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to list items'
+        return InventoryItem(token=self.session.token, item_type=f'biocollections/{item_type}').list(page_num=page_num)
 
     """
     Stock API
     """
     def add_stock(self, stock_name, storage_id, storage_type, stockable_type, stockable_id, **kwargs):
+        assert isinstance(stock_name, str) and len(stock_name) > 0, 'stock_name is required to create a new stock'
+        assert storage_id, 'storage_id is required to create a new stock'
+        assert storage_type, 'storage_type is required to create a new stock'
+        assert stockable_type, 'stockable_type is required to create a new stock'
+        assert stockable_id, 'stockable_id is required to create a new stock'
         return Stock(token=self.session.token,
                        name=stock_name,
                        storage_id=storage_id,
@@ -221,13 +253,15 @@ class Labguru(object):
                        stockable_type=stockable_type,
                        stockable_id=stockable_id, **kwargs).register()
 
-    def find_stock(self, name):
+    def find_stocks(self, name):
         return Stock(token=self.session.token).list(name=name)
 
-    def get_stock(self, element_id):
-        return Stock(token=self.session.token, id=element_id).get()
+    def get_stock(self, stock_id):
+        assert stock_id, 'stock_id is required to get stock'
+        return Stock(token=self.session.token, id=stock_id).get()
 
     def update_stock(self, stock_id, **kwargs):
+        assert stock_id, 'stock_id is required to update stock'
         return Stock(token=self.session.token, id=stock_id, **kwargs).update()
 
     def list_stocks(self, page_num):
