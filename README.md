@@ -71,9 +71,9 @@ print(project_new)
 Find a project by name
 
 ``` python
-project = lab.find_projects(name="My new project")
+projects = lab.find_projects(name="My new project")
 
-print(project)
+print(projects)
 ```
 
 Update a project
@@ -119,9 +119,9 @@ print(folder_new)
 Find a folder by name
 
 ``` python
-folder = lab.find_folders(name="My new folder")
+folders = lab.find_folders(name="My new folder")
 
-print(folder)
+print(folders)
 ```
 
 Update a folder
@@ -168,9 +168,9 @@ print(experiment_new)
 Find a experiment by name
 
 ``` python
-experiment = lab.find_experiments(name="My new experiment")
+experiments = lab.find_experiments(name="My new experiment")
 
-print(experiment)
+print(experiments)
 ```
 
 Update a experiment
@@ -197,9 +197,9 @@ print(section)
 Find section
 
 ``` python
-section = lab.find_experiment_procedures(name='test1')
+sections = lab.find_experiment_procedures(name='test1')
 
-print(section)
+print(sections)
 ```
 
 Get section

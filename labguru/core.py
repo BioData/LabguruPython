@@ -215,27 +215,19 @@ class Labguru(object):
     Generic Inventory Item API
     """
     def add_inventory_generic_item(self, name, item_type):
-        assert isinstance(name, str) and len(name) > 0, 'title is required to create a new item'
-        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to create a new item'
-        return InventoryItem(token=self.session.token, name=name, item_type=f'biocollections/{item_type}').register()
+        return self.add_inventory_item(name=name, item_type=f'biocollections/{item_type}')
 
     def get_inventory_generic_item(self, item_id, item_type):
-        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to get item'
-        item = InventoryItem(id=item_id, token=self.session.token, item_type=f'biocollections/{item_type}')
-        return item.get()
+        return self.get_inventory_item(item_id=item_id, item_type=f'biocollections/{item_type}')
 
     def find_inventory_generic_items(self, name, item_type):
-        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to find items'
-        return InventoryItem(token=self.session.token, item_type=f'biocollections/{item_type}').list(name=name)
+        return self.find_inventory_items(name=name, item_type=f'biocollections/{item_type}')
 
     def update_inventory_generic_item(self, item_id, name, item_type, **kwargs):
-        assert item_id, 'item_id is required to update inventory item'
-        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to update item'
-        return InventoryItem(token=self.session.token, id=item_id, name=name, item_type=f'biocollections/{item_type}', **kwargs).update()
+        return self.update_inventory_item(item_id=item_id, name=name, item_type=f'biocollections/{item_type}', **kwargs)
 
     def list_inventory_generic_items(self, item_type, page_num):
-        assert isinstance(item_type, str) and len(item_type) > 0, 'item_type is required to list items'
-        return InventoryItem(token=self.session.token, item_type=f'biocollections/{item_type}').list(page_num=page_num)
+        return self.list_inventory_items(item_type=f'biocollections/{item_type}', page_num=page_num)
 
     """
     Stock API
