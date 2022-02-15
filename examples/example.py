@@ -4,7 +4,8 @@ from labguru import Labguru
 
 
 def get_token():
-    lab = Labguru(login='login@gmail.com', password='123password')
+    # lab = Labguru(login='login@gmail.com', password='123password')
+    lab = Labguru(login='noakap92@gmail.com', password='Noa203641931!')
     return lab
 
 
@@ -13,7 +14,6 @@ def main():
     print(lab.session.token)
 
     # project
-    # prj = lab.add_project(title='new _add project')
     # print(prj)
     # print(lab.update_project(project_id=prj.id, title='Update title for 201', description='Update description for 201'))
 

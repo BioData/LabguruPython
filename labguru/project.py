@@ -99,7 +99,7 @@ class Element(Project):
         self.container_type = container_type
         self.endpoint = '/api/v1/elements.json'
         self.specific_endpoint = '/api/v1/elements/{id}.json'
-        self.specific_endpoint_type = '/api/v1/experiments/{id}/elements.json?&element_type={element_type}'
+        self.specific_endpoint_type = '/api/v1/experiments/{id}/elements.json'
         self.update_stock_amount_endpoint = '/api/v1/stocks/{id}/update_stock_amount'
         self.add_attachment_endpoint = '/api/v1/attachments/{id}'
 
@@ -108,8 +108,8 @@ class Element(Project):
         return self.__class__(token=self.token, **response)
 
     def list_by_type(self):
-        response = self.filter(endpoint=self.specific_endpoint_type, experiment_id=self.experiment_id,
-                               element_type=self.element_type, method='GET')
+        response = self._get_or_update(endpoint=self.specific_endpoint_type, id=self.experiment_id,
+                                       element_type=self.element_type)
         if isinstance(response, list):
             return [self.__class__(token=self.token, **item) for item in response]
         else:
