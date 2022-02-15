@@ -71,9 +71,9 @@ print(project_new)
 Find a project by name
 
 ``` python
-project = lab.find_project(name="My new project")
+projects = lab.find_projects(name="My new project")
 
-print(project)
+print(projects)
 ```
 
 Update a project
@@ -119,9 +119,9 @@ print(folder_new)
 Find a folder by name
 
 ``` python
-folder = lab.find_folder(name="My new folder")
+folders = lab.find_folders(name="My new folder")
 
-print(folder)
+print(folders)
 ```
 
 Update a folder
@@ -168,9 +168,9 @@ print(experiment_new)
 Find a experiment by name
 
 ``` python
-experiment = lab.find_experiment(name="My new experiment")
+experiments = lab.find_experiments(name="My new experiment")
 
-print(experiment)
+print(experiments)
 ```
 
 Update a experiment
@@ -197,9 +197,9 @@ print(section)
 Find section
 
 ``` python
-section = lab.find_experiment_procedure(name='test1')
+sections = lab.find_experiment_procedures(name='test1')
 
-print(section)
+print(sections)
 ```
 
 Get section
@@ -255,7 +255,7 @@ print(element)
 List elements by type
 
 ``` python
-elements = lab.get_element_by_type(experiment_id=586, element_type='plate')
+elements = lab.get_elements_by_type(experiment_id=586, element_type='plate')
 
 print(elements)
 ```
@@ -265,7 +265,7 @@ print(elements)
 Add item
 
 ``` python
-item = lab.add_item(name='cell_line_1', item_type='cell_lines')
+item = lab.add_inventory_item(name='cell_line_1', item_type='cell_lines')
 
 print(item)
 ```
@@ -273,7 +273,7 @@ print(item)
 Get item
 
 ``` python
-items = lab.get_item(item_id=329, item_type='cell_lines')
+items = lab.get_inventory_item(item_id=329, item_type='cell_lines')
 
 print(items)
 ```
@@ -281,7 +281,7 @@ print(items)
 Update item
 
 ``` python
-item = lab.update_item(item_id=329, item_type='cell_lines', name='new name')
+item = lab.update_inventory_item(item_id=329, item_type='cell_lines', name='new name')
 
 print(item)
 ```
@@ -289,7 +289,7 @@ print(item)
 List items
 
 ``` python
-items = lab.list_item(item_type='cell_lines', page_num=1)
+items = lab.list_inventory_items(item_type='cell_lines', page_num=1)
 
 print(items)
 ```

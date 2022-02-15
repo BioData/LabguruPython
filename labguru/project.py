@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import sys
 from datetime import datetime
 import json
 
@@ -98,7 +99,7 @@ class Element(Project):
         self.container_type = container_type
         self.endpoint = '/api/v1/elements.json'
         self.specific_endpoint = '/api/v1/elements/{id}.json'
-        self.specific_endpoint_type = '/api/v1/experiments/{id}/elements.json?&element_type={element_type}'
+        self.specific_endpoint_type = '/api/v1/experiments/{id}/elements.json'
         self.update_stock_amount_endpoint = '/api/v1/stocks/{id}/update_stock_amount'
         self.add_attachment_endpoint = '/api/v1/attachments/{id}'
 
@@ -107,8 +108,8 @@ class Element(Project):
         return self.__class__(token=self.token, **response)
 
     def list_by_type(self):
-        response = self.filter(endpoint=self.specific_endpoint_type, experiment_id=self.experiment_id,
-                               element_type=self.element_type, method='GET')
+        response = self._get_or_update(endpoint=self.specific_endpoint_type, id=self.experiment_id,
+                                       element_type=self.element_type)
         if isinstance(response, list):
             return [self.__class__(token=self.token, **item) for item in response]
         else:
@@ -123,6 +124,10 @@ class Element(Project):
 
         elif self.element_type == 'plate':
             return json.loads(self.data).get('wells')
+
+        else:
+            return self.data
+
 
     def update_stock_amount(self, sample_id, stock_id, amount_used, unit_type, unit_type_name):
         if self.element_type == 'samples':
