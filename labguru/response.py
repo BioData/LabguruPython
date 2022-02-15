@@ -46,17 +46,6 @@ class Response(object):
         data['token'] = self.token
         return api.request(url, method='GET', data=data)
 
-    def filter(self, endpoint, experiment_id, element_type, method='GET', **kwargs):
-        url = api.normalise(endpoint.format(id=experiment_id, element_type=element_type))
-        data = filter_none(kwargs)
-        data['token'] = self.token
-        try:
-            return api.request(url, method=method, data=data)
-        except HTTPError:
-            raise NotFoundException('{element_type} {experiment_id} does not exist'.format(name=self.__class__,
-                                                                                           experiment_id=experiment_id,
-                                                                                           element_type=element_type))
-
     def __str__(self):
         return json.dumps(self.__dict__)
 
