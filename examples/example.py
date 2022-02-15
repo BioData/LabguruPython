@@ -4,8 +4,7 @@ from labguru import Labguru
 
 
 def get_token():
-    # lab = Labguru(login='login@gmail.com', password='123password')
-    lab = Labguru(login='noakap92@gmail.com', password='Noa203641931!')
+    lab = Labguru(login='login@gmail.com', password='123password')
     return lab
 
 
