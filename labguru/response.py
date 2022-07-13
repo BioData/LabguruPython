@@ -51,6 +51,6 @@ class Response(object):
 
 
 class Session(Response):
-    def __init__(self, token, url, admin, orders, account_id, environment):
-        Response.__init__(self, token=token, url=url, admin=admin, orders=orders, account_id=account_id,
+    def __init__(self, token, url, admin, orders, account_id, account_name, environment):
+        Response.__init__(self, token=token, url=url, admin=admin, orders=orders, account_id=account_id, account_name=account_name,
                           environment=environment)
