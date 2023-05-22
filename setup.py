@@ -21,7 +21,7 @@ setup(
     install_requires=[
         'nose',
         'sphinx',
-        'requests==2.11.1',
+        'requests==2.31.0',
         'vcrpy==1.10.3',
         'pytest==3.0.3',
         'bunch'
