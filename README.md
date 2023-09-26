@@ -301,13 +301,21 @@ List Datasets
 ``` python
 datasets = lab.list_datsets(page_num=1)
 
-print(items)
+print(datasets)
 ```
 
 Get Datasets
 
 ``` python
-items = lab.get_dataset(dataset_id=13)
+dataset = lab.get_dataset(dataset_id=13)
 
-print(items)
+print(dataset)
+```
+
+Add Dataset
+
+``` python
+dataset = lab.add_dataset(dataset_name="Table", data=df)
+
+print(dataset)
 ```
