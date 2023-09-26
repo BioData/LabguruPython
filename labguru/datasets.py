@@ -21,3 +21,7 @@ class Datasets(Response):
     def get(self):
         response = self._get_or_update(endpoint=self.specific_endpoint, id=self.id, method='GET')
         return self.__class__(token=self.token, **response)
+    
+    def register(self):
+        response = self._add(endpoint=self.endpoint, item=self.to_dict())
+        return self.__class__(token=self.token, **response)

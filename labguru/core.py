@@ -272,3 +272,11 @@ class Labguru(object):
     def get_dataset(self, dataset_id):
         validate_required_fields(action='get dataset', dataset_id=dataset_id)
         return Datasets(token=self.session.token, id=dataset_id).get()
+    
+    def add_dataset(self, dataset_name, dataset_id, data, **kwargs):
+        validate_names(action='create a new dataset', dataset_name=dataset_name)
+        validate_required_fields(action='create a new dataset', dataset_id=dataset_id)
+        return Datasets(token=self.session.token,
+                       name=dataset_name,
+                       id=dataset_id,
+                       data=data, **kwargs).register()
