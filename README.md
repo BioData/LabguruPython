@@ -293,3 +293,21 @@ items = lab.list_inventory_items(item_type='cell_lines', page_num=1)
 
 print(items)
 ```
+
+## Datasets
+
+List Datasets
+
+``` python
+datasets = lab.list_datsets(page_num=1)
+
+print(items)
+```
+
+Get Datasets
+
+``` python
+items = lab.get_dataset(dataset_id=13)
+
+print(items)
+```
