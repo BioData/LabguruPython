@@ -25,6 +25,6 @@ setup(
         'vcrpy==1.10.3',
         'pytest==7.4.0',
     ],
-    # packages=find_packages(exclude=('tests', 'docs'))
+    packages=find_packages(exclude=('tests', 'docs'))
 )
 
