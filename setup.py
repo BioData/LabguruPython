@@ -23,7 +23,7 @@ setup(
         'sphinx',
         'requests==2.31.0',
         'vcrpy==1.10.3',
-        'pytest==7.4.0',
+        'pytest>=7.3.1',
     ],
     packages=find_packages(exclude=('tests', 'docs'))
 )
