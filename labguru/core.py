@@ -4,6 +4,7 @@ from __future__ import print_function
 from . import api
 from .error import UnAuthorizeException
 from .project import Project, Folder, Experiment, Procedure, Element
+from .datasets import Datasets
 from .inventory import InventoryItem, Stock
 from .response import Session
 from .validation import validate_required_fields, validate_names
@@ -260,3 +261,22 @@ class Labguru(object):
 
     def list_stocks(self, page_num):
         return Stock(token=self.session.token).list(page_num=page_num)
+
+    """
+    Datasets API
+    """
+
+    def list_datasets(self, page_num):
+        return Datasets(token=self.session.token).list(page_num=page_num)
+    
+    def get_dataset(self, dataset_id):
+        validate_required_fields(action='get dataset', dataset_id=dataset_id)
+        return Datasets(token=self.session.token, id=dataset_id).get()
+    
+    def add_dataset(self, dataset_name, dataset_id, data, **kwargs):
+        validate_names(action='create a new dataset', dataset_name=dataset_name)
+        validate_required_fields(action='create a new dataset', dataset_id=dataset_id)
+        return Datasets(token=self.session.token,
+                       name=dataset_name,
+                       id=dataset_id,
+                       data=data, **kwargs).register()

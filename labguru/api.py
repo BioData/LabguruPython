@@ -14,7 +14,7 @@ request_method = {
 }
 
 
-def normalise(path, base='https://my.labguru.com'):
+def normalise(path, base='https://eu.labguru.com'):
     parsed_path = urlparse(path)
     parsed_base = urlparse(base)
     if parsed_path.scheme in ['http', 'https']:
