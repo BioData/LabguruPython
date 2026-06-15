@@ -80,3 +80,13 @@ def test_global_search_hits_endpoint():
     route = respx.get(f"{BASE}/api/v1/searches/global_search").mock(return_value=httpx.Response(200, json={"results": []}))
     SearchResource(client).global_search("lgcopier:src=abc")
     assert route.calls.last.request.url.params["term"] == "lgcopier:src=abc"
+
+
+@respx.mock
+def test_biocollections_find_by_external_uuid():
+    from labguru.resources.biocollections import BiocollectionsResource
+    client = LabguruClient(BASE, "t0k")
+    route = respx.get(f"{BASE}/api/v1/plasmids").mock(return_value=httpx.Response(200, json=[{"id": 7}]))
+    out = BiocollectionsResource(client, "plasmids").find_by_external_uuid("src-99")
+    assert out == [{"id": 7}]
+    assert route.calls.last.request.url.params["external_uuid"] == "src-99"

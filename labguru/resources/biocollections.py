@@ -1,0 +1,19 @@
+# labguru/resources/biocollections.py
+from labguru.resources.base import BaseResource
+
+
+class BiocollectionsResource(BaseResource):
+    item_key = "item"
+
+    def __init__(self, client, collection: str = "plasmids"):
+        super().__init__(client)
+        self.resource_name = collection
+
+    def for_collection(self, collection: str) -> "BiocollectionsResource":
+        return BiocollectionsResource(self.client, collection)
+
+    def create(self, fields: dict):
+        return self.client.post(self._path(), {self.item_key: fields})
+
+    def find_by_external_uuid(self, external_uuid: str):
+        return self.client.get(self._path(), params={"external_uuid": external_uuid})
