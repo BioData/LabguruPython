@@ -43,3 +43,17 @@ def test_protocols_create_passes_arbitrary_fields():
     assert body["item"]["external_uuid"] == "src-123"
     assert body["item"]["custom1"] == "v"
     assert body["item"]["name"] == "PCR"
+
+
+@respx.mock
+def test_template_resources_wrap_under_item_key():
+    from labguru.resources.experiments import ExperimentsResource
+    from labguru.resources.projects import ProjectsResource
+    client = LabguruClient(BASE, "t0k")
+    respx.post(f"{BASE}/api/v1/experiments").mock(return_value=httpx.Response(201, json={"id": 1}))
+    route = respx.put(f"{BASE}/api/v1/projects/7").mock(return_value=httpx.Response(200, json={"id": 7}))
+    ExperimentsResource(client).create({"title": "E1"})
+    ProjectsResource(client).update(7, {"title": "renamed", "external_uuid": "p-9"})
+    body = json.loads(route.calls.last.request.content)
+    assert body["item"]["title"] == "renamed"
+    assert body["item"]["external_uuid"] == "p-9"
