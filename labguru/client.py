@@ -23,14 +23,24 @@ def build_filter_params(filters: list[dict], prefix: str = "filter[filters]") ->
 
 
 class LabguruClient:
-    """Sync HTTP client for one Labguru instance. Construct one per instance."""
+    """Sync HTTP client for one Labguru instance. Construct one per instance.
+
+    Each request opens and closes its own ``httpx.Client`` (no connection
+    pooling/reuse) — a deliberate simplicity tradeoff for this release.
+    """
 
     def __init__(self, base_url: str, token: str):
         self.base_url = base_url.rstrip("/")
         self.token = token
 
-    def _request(self, method: str, path: str, *, params=None, json=None,
-                 data=None, files=None, timeout=_TIMEOUT) -> Any:
+    def _request(
+        self, method: str, path: str, *,
+        params: Optional[dict] = None,
+        json: Optional[Any] = None,
+        data: Optional[dict] = None,
+        files: Optional[dict] = None,
+        timeout: float = _TIMEOUT,
+    ) -> Any:
         request_params = dict(params or {})
         request_params["token"] = self.token
         with httpx.Client() as client:
