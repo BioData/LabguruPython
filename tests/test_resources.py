@@ -71,3 +71,12 @@ def test_members_is_read_only():
                  lambda: members.delete(1)):
         with pytest.raises(LabguruError):
             call()
+
+
+@respx.mock
+def test_global_search_hits_endpoint():
+    from labguru.resources.search import SearchResource
+    client = LabguruClient(BASE, "t0k")
+    route = respx.get(f"{BASE}/api/v1/searches/global_search").mock(return_value=httpx.Response(200, json={"results": []}))
+    SearchResource(client).global_search("lgcopier:src=abc")
+    assert route.calls.last.request.url.params["term"] == "lgcopier:src=abc"
