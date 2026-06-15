@@ -37,7 +37,9 @@ def test_list_get_create_update_delete():
 def test_protocols_create_passes_arbitrary_fields():
     from labguru.resources.protocols import ProtocolsResource
     client = LabguruClient(BASE, "t0k")
-    route = respx.post(f"{BASE}/api/v1/protocols").mock(return_value=httpx.Response(201, json={"id": 5}))
+    route = respx.post(f"{BASE}/api/v1/protocols").mock(
+        return_value=httpx.Response(201, json={"id": 5})
+    )
     ProtocolsResource(client).create({"name": "PCR", "external_uuid": "src-123", "custom1": "v"})
     body = json.loads(route.calls.last.request.content)
     assert body["item"]["external_uuid"] == "src-123"
@@ -51,7 +53,9 @@ def test_template_resources_wrap_under_item_key():
     from labguru.resources.projects import ProjectsResource
     client = LabguruClient(BASE, "t0k")
     respx.post(f"{BASE}/api/v1/experiments").mock(return_value=httpx.Response(201, json={"id": 1}))
-    route = respx.put(f"{BASE}/api/v1/projects/7").mock(return_value=httpx.Response(200, json={"id": 7}))
+    route = respx.put(f"{BASE}/api/v1/projects/7").mock(
+        return_value=httpx.Response(200, json={"id": 7})
+    )
     ExperimentsResource(client).create({"title": "E1"})
     ProjectsResource(client).update(7, {"title": "renamed", "external_uuid": "p-9"})
     body = json.loads(route.calls.last.request.content)
@@ -77,7 +81,9 @@ def test_members_is_read_only():
 def test_global_search_hits_endpoint():
     from labguru.resources.search import SearchResource
     client = LabguruClient(BASE, "t0k")
-    route = respx.get(f"{BASE}/api/v1/searches/global_search").mock(return_value=httpx.Response(200, json={"results": []}))
+    route = respx.get(f"{BASE}/api/v1/searches/global_search").mock(
+        return_value=httpx.Response(200, json={"results": []})
+    )
     SearchResource(client).global_search("lgcopier:src=abc")
     assert route.calls.last.request.url.params["term"] == "lgcopier:src=abc"
 
@@ -86,7 +92,24 @@ def test_global_search_hits_endpoint():
 def test_biocollections_find_by_external_uuid():
     from labguru.resources.biocollections import BiocollectionsResource
     client = LabguruClient(BASE, "t0k")
-    route = respx.get(f"{BASE}/api/v1/plasmids").mock(return_value=httpx.Response(200, json=[{"id": 7}]))
+    route = respx.get(f"{BASE}/api/v1/plasmids").mock(
+        return_value=httpx.Response(200, json=[{"id": 7}])
+    )
     out = BiocollectionsResource(client, "plasmids").find_by_external_uuid("src-99")
     assert out == [{"id": 7}]
     assert route.calls.last.request.url.params["external_uuid"] == "src-99"
+
+
+def test_facade_exposes_namespaces_and_client():
+    from labguru import Labguru
+    lab = Labguru(url="https://demo.labguru.com", token="t0k")
+    assert lab.protocols.resource_name == "protocols"
+    assert lab.projects.resource_name == "projects"
+    assert lab.client.token == "t0k"
+
+
+def test_legacy_login_password_is_rejected_with_clear_error():
+    from labguru import Labguru
+    with pytest.raises(LabguruError) as ei:
+        Labguru(login="a@b.com", password="pw")
+    assert "token" in str(ei.value).lower()

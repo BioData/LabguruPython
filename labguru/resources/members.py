@@ -1,6 +1,6 @@
 # labguru/resources/members.py
-from labguru.resources.base import BaseResource
 from labguru.exceptions import LabguruError
+from labguru.resources.base import BaseResource
 
 
 class MembersResource(BaseResource):

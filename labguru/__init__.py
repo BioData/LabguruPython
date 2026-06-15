@@ -1,4 +1,7 @@
-# Package init intentionally minimal during the 2.0 relaunch.
-# The public `Labguru` facade is wired in labguru/facade.py and re-exported here
-# once the resource layer exists (see Phase 2.2). The pre-2.0 modules
-# (api/core/response/project/inventory/...) are removed in Phase 4.2.
+# labguru/__init__.py
+from labguru.client import LabguruClient
+from labguru.exceptions import LabguruAPIError, LabguruError
+from labguru.facade import Labguru
+
+__all__ = ["Labguru", "LabguruClient", "LabguruError", "LabguruAPIError"]
+__version__ = "2.0.0"
