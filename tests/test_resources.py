@@ -113,3 +113,39 @@ def test_legacy_login_password_is_rejected_with_clear_error():
     with pytest.raises(LabguruError) as ei:
         Labguru(login="a@b.com", password="pw")
     assert "token" in str(ei.value).lower()
+
+
+@respx.mock
+def test_biocollections_update_wraps_under_item_key():
+    from labguru.resources.biocollections import BiocollectionsResource
+    client = LabguruClient(BASE, "t0k")
+    route = respx.put(f"{BASE}/api/v1/plasmids/7").mock(
+        return_value=httpx.Response(200, json={"id": 7})
+    )
+    BiocollectionsResource(client, "plasmids").update(7, {"name": "n", "external_uuid": "u"})
+    body = json.loads(route.calls.last.request.content)
+    assert body["item"]["name"] == "n"
+    assert body["item"]["external_uuid"] == "u"
+
+
+def test_facade_rejects_empty_url():
+    from labguru import Labguru
+    with pytest.raises(LabguruError):
+        Labguru(url="", token="t0k")
+
+
+def test_facade_rejects_legacy_kwargs_even_with_token():
+    from labguru import Labguru
+    with pytest.raises(LabguruError) as ei:
+        Labguru(url="https://demo.labguru.com", token="t0k", password="pw")
+    assert "token" in str(ei.value).lower()
+
+
+@respx.mock
+def test_search_is_read_only():
+    from labguru.resources.search import SearchResource
+    client = LabguruClient(BASE, "t0k")
+    s = SearchResource(client)
+    for call in (lambda: s.create({}), lambda: s.update(1, {}), lambda: s.delete(1)):
+        with pytest.raises(LabguruError):
+            call()

@@ -7,13 +7,20 @@ class BiocollectionsResource(BaseResource):
 
     def __init__(self, client, collection: str = "plasmids"):
         super().__init__(client)
+        if not collection:
+            raise ValueError("collection must be a non-empty string")
         self.resource_name = collection
 
     def for_collection(self, collection: str) -> "BiocollectionsResource":
         return BiocollectionsResource(self.client, collection)
 
     def create(self, fields: dict):
+        """fields: inner payload, wrapped as {item_key: fields} before sending."""
         return self.client.post(self._path(), {self.item_key: fields})
+
+    def update(self, resource_id, fields: dict):
+        """fields: inner payload, wrapped as {item_key: fields} before sending."""
+        return self.client.put(self._path(f"/{resource_id}"), {self.item_key: fields})
 
     def find_by_external_uuid(self, external_uuid: str):
         return self.client.get(self._path(), params={"external_uuid": external_uuid})

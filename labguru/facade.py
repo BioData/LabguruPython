@@ -22,13 +22,13 @@ class Labguru:
     """Entry point. Usage: `lab = Labguru(url="https://my.labguru.com", token="...")`."""
 
     def __init__(self, url: Optional[str] = None, token: Optional[str] = None, **legacy):
-        if token is None or url is None:
-            if "login" in legacy or "password" in legacy:
-                raise LabguruError(
-                    "Email/password auth was removed in 2.0. Pass an API token: "
-                    "Labguru(url='https://my.labguru.com', token='...'). "
-                    "Get a token from your Labguru account settings."
-                )
+        if "login" in legacy or "password" in legacy:
+            raise LabguruError(
+                "Email/password auth was removed in 2.0. Pass an API token: "
+                "Labguru(url='https://my.labguru.com', token='...'). "
+                "Get a token from your Labguru account settings."
+            )
+        if not token or not url:
             raise LabguruError("Labguru(url=..., token=...) are required.")
         self.client = LabguruClient(url, token)
         self.protocols = ProtocolsResource(self.client)
