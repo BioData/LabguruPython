@@ -52,12 +52,16 @@ def test_template_resources_wrap_under_item_key():
     from labguru.resources.experiments import ExperimentsResource
     from labguru.resources.projects import ProjectsResource
     client = LabguruClient(BASE, "t0k")
-    respx.post(f"{BASE}/api/v1/experiments").mock(return_value=httpx.Response(201, json={"id": 1}))
+    exp_route = respx.post(f"{BASE}/api/v1/experiments").mock(
+        return_value=httpx.Response(201, json={"id": 1})
+    )
     route = respx.put(f"{BASE}/api/v1/projects/7").mock(
         return_value=httpx.Response(200, json={"id": 7})
     )
     ExperimentsResource(client).create({"title": "E1"})
     ProjectsResource(client).update(7, {"title": "renamed", "external_uuid": "p-9"})
+    exp_body = json.loads(exp_route.calls.last.request.content)
+    assert exp_body["item"]["title"] == "E1"
     body = json.loads(route.calls.last.request.content)
     assert body["item"]["title"] == "renamed"
     assert body["item"]["external_uuid"] == "p-9"
@@ -149,3 +153,25 @@ def test_search_is_read_only():
     for call in (lambda: s.create({}), lambda: s.update(1, {}), lambda: s.delete(1)):
         with pytest.raises(LabguruError):
             call()
+
+
+@respx.mock
+def test_protocols_tags_endpoint():
+    from labguru.resources.protocols import ProtocolsResource
+    client = LabguruClient(BASE, "t0k")
+    route = respx.get(f"{BASE}/api/v1/protocols/5/tags").mock(
+        return_value=httpx.Response(200, json=[{"id": 1}])
+    )
+    assert ProtocolsResource(client).tags(5) == [{"id": 1}]
+    assert route.called
+
+
+@respx.mock
+def test_storages_boxes_endpoint():
+    from labguru.resources.storages import StoragesResource
+    client = LabguruClient(BASE, "t0k")
+    route = respx.get(f"{BASE}/api/v1/storages/3/boxes").mock(
+        return_value=httpx.Response(200, json=[{"id": 2}])
+    )
+    assert StoragesResource(client).boxes(3) == [{"id": 2}]
+    assert route.called

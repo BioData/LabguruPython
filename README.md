@@ -59,12 +59,16 @@ A `Labguru` instance exposes one namespace per resource. Each namespace provides
 | `lab.storages` | also `.boxes(id)` |
 | `lab.tags` | |
 | `lab.members` | **read-only** (list/get) |
-| `lab.search` | `.global_search(term)` only (read-only) |
+| `lab.search` | `.global_search(term)` plus inherited reads; writes blocked |
 | `lab.biocollections` | `.for_collection(name)`, `.find_by_external_uuid(uuid)` |
 
 `create`/`update` take the **inner** payload — the SDK wraps it under the API's
 `item` key for you. Pass arbitrary fields (`external_uuid`, `custom1..N`, `tags`)
 directly; they are forwarded unchanged.
+
+For Kendo-style server-side filters, drop to the low-level client escape hatch:
+`lab.client.get_with_filters(path, filters=[{"field": ..., "operator": ..., "value": ...}])`.
+The namespaced `list(**params)` methods send their kwargs as plain query params.
 
 ```python
 # Work against a named biocollection

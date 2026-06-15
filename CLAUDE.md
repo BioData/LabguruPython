@@ -67,7 +67,8 @@ one resource namespace per attribute (`lab.protocols`, `lab.experiments`,
 ### Resource specifics
 
 - **Read-only resources** (`members`, `search`) override the inherited write methods
-  to raise `LabguruError`. `search` exposes only `global_search(term)`.
+  to raise `LabguruError`. `search` adds `global_search(term)`; its inherited
+  `list`/`get` are left in place (write methods are what's blocked).
 - **`biocollections`** is addressed by collection name: `for_collection(name)`
   returns a new instance with `resource_name = name`; `find_by_external_uuid(uuid)`
   filters the collection index by `external_uuid`.
