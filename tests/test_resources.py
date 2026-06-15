@@ -57,3 +57,17 @@ def test_template_resources_wrap_under_item_key():
     body = json.loads(route.calls.last.request.content)
     assert body["item"]["title"] == "renamed"
     assert body["item"]["external_uuid"] == "p-9"
+
+
+@respx.mock
+def test_members_is_read_only():
+    from labguru.resources.members import MembersResource
+    client = LabguruClient(BASE, "t0k")
+    members = MembersResource(client)
+    respx.get(f"{BASE}/api/v1/members").mock(return_value=httpx.Response(200, json=[{"id": 1}]))
+    assert members.list() == [{"id": 1}]
+    for call in (lambda: members.create({"name": "x"}),
+                 lambda: members.update(1, {"name": "x"}),
+                 lambda: members.delete(1)):
+        with pytest.raises(LabguruError):
+            call()
