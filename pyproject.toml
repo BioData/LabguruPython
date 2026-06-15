@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "labguru"
+version = "2.0.0"
+description = "Official Python SDK for the Labguru API"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "BioData" }]
+keywords = ["labguru", "api", "sdk", "eln", "lims", "laboratory"]
+dependencies = ["httpx>=0.27"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-recording>=0.13", "respx>=0.21", "ruff>=0.6"]
+
+[project.urls]
+Homepage = "https://github.com/BioData/LabguruPython"
+Documentation = "https://my.labguru.com/api/docs/"
+
+[tool.hatch.build.targets.wheel]
+packages = ["labguru"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
