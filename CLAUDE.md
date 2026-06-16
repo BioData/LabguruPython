@@ -66,14 +66,17 @@ one resource namespace per attribute (`lab.protocols`, `lab.experiments`,
 
 ### Resource specifics
 
-- **Read-only resources** (`members`, `search`) override the inherited write methods
-  to raise `LabguruError`. `search` adds `global_search(term)`; its inherited
-  `list`/`get` are left in place (write methods are what's blocked).
+- **Restricted resources** (verified against the API spec): `members` is read-only
+  at `/api/v1/admin/members` (`list()` only); `search` exposes `global_search(term,
+  size)` only; `tags` supports create + delete only. These override the unsupported
+  inherited methods to raise `LabguruError`.
 - **`biocollections`** is addressed by collection name: `for_collection(name)`
-  returns a new instance with `resource_name = name`; `find_by_external_uuid(uuid)`
-  filters the collection index by `external_uuid`.
-- **Sub-resource endpoints:** `ProtocolsResource.tags(id)` →
-  `/protocols/{id}/tags`; `StoragesResource.boxes(id)` → `/storages/{id}/boxes`.
+  returns a new instance with `resource_name = name`. `find_by_external_uuid(uuid)`
+  exists but is **unverified** — `external_uuid` is not in the API spec (see the
+  ledger in MIGRATION.md); real filtering uses the Kendo `/{collection_name}` endpoint.
+- **Per-verb support varies by resource** (e.g. most resources have no `DELETE`; an
+  unsupported inherited call raises `LabguruAPIError(404)`). The authoritative table
+  is the resource support matrix in [MIGRATION.md](MIGRATION.md).
 
 ### Errors (`exceptions.py`)
 

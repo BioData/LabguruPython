@@ -4,9 +4,11 @@ from labguru.resources.base import BaseResource
 
 
 class MembersResource(BaseResource):
-    """Read-only: the Labguru members API exposes index/show only."""
+    """Read-only. The API exposes a single GET index at /api/v1/admin/members
+    (use ``list()``); there is no show/create/update/delete endpoint.
+    """
 
-    resource_name = "members"
+    resource_name = "admin/members"
 
     def create(self, *args, **kwargs):
         raise LabguruError("members is read-only; create is not supported")

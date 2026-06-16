@@ -52,15 +52,19 @@ A `Labguru` instance exposes one namespace per resource. Each namespace provides
 |---|---|
 | `lab.projects` | |
 | `lab.experiments` | |
-| `lab.sections` | experiment procedures |
-| `lab.elements` | pass `container_type`/`container_id`/`element_type`/`data` in the fields dict |
-| `lab.protocols` | also `.tags(id)` |
+| `lab.sections` | experiment procedures; no `list()` (no collection index) |
+| `lab.elements` | pass `container_type`/`container_id`/`element_type`/`data` in the fields dict; list via experiments |
+| `lab.protocols` | |
 | `lab.stocks` | |
-| `lab.storages` | also `.boxes(id)` |
-| `lab.tags` | |
-| `lab.members` | **read-only** (list/get) |
-| `lab.search` | `.global_search(term)` plus inherited reads; writes blocked |
-| `lab.biocollections` | `.for_collection(name)`, `.find_by_external_uuid(uuid)` |
+| `lab.storages` | |
+| `lab.tags` | **create + delete only** (list/get/update raise) |
+| `lab.members` | **read-only**, `list()` only (`GET /api/v1/admin/members`) |
+| `lab.search` | `.global_search(term, size=20)` only; writes blocked |
+| `lab.biocollections` | `.for_collection(name)`; `.find_by_external_uuid(uuid)` is **unverified** (see MIGRATION.md) |
+
+> Not every namespace supports every verb — the Labguru API varies by resource.
+> See the **resource support matrix** in [MIGRATION.md](MIGRATION.md) for what each
+> one actually supports (verified against the API spec).
 
 `create`/`update` take the **inner** payload — the SDK wraps it under the API's
 `item` key for you. Pass arbitrary fields (`external_uuid`, `custom1..N`, `tags`)

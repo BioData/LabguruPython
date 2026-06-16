@@ -72,7 +72,9 @@ def test_members_is_read_only():
     from labguru.resources.members import MembersResource
     client = LabguruClient(BASE, "t0k")
     members = MembersResource(client)
-    respx.get(f"{BASE}/api/v1/members").mock(return_value=httpx.Response(200, json=[{"id": 1}]))
+    respx.get(f"{BASE}/api/v1/admin/members").mock(
+        return_value=httpx.Response(200, json=[{"id": 1}])
+    )
     assert members.list() == [{"id": 1}]
     for call in (lambda: members.create({"name": "x"}),
                  lambda: members.update(1, {"name": "x"}),
@@ -89,7 +91,9 @@ def test_global_search_hits_endpoint():
         return_value=httpx.Response(200, json={"results": []})
     )
     SearchResource(client).global_search("lgcopier:src=abc")
-    assert route.calls.last.request.url.params["term"] == "lgcopier:src=abc"
+    params = route.calls.last.request.url.params
+    assert params["term"] == "lgcopier:src=abc"
+    assert params["size"] == "20"  # required by the API; defaulted by the SDK
 
 
 @respx.mock
@@ -156,22 +160,19 @@ def test_search_is_read_only():
 
 
 @respx.mock
-def test_protocols_tags_endpoint():
-    from labguru.resources.protocols import ProtocolsResource
+def test_tags_supports_create_and_delete_only():
+    from labguru.resources.tags import TagsResource
     client = LabguruClient(BASE, "t0k")
-    route = respx.get(f"{BASE}/api/v1/protocols/5/tags").mock(
-        return_value=httpx.Response(200, json=[{"id": 1}])
+    tags = TagsResource(client)
+    create = respx.post(f"{BASE}/api/v1/tags").mock(
+        return_value=httpx.Response(201, json={"id": 1})
     )
-    assert ProtocolsResource(client).tags(5) == [{"id": 1}]
-    assert route.called
-
-
-@respx.mock
-def test_storages_boxes_endpoint():
-    from labguru.resources.storages import StoragesResource
-    client = LabguruClient(BASE, "t0k")
-    route = respx.get(f"{BASE}/api/v1/storages/3/boxes").mock(
-        return_value=httpx.Response(200, json=[{"id": 2}])
-    )
-    assert StoragesResource(client).boxes(3) == [{"id": 2}]
-    assert route.called
+    delete = respx.delete(f"{BASE}/api/v1/tags/1").mock(return_value=httpx.Response(204))
+    assert tags.create({"name": "x"}) == {"id": 1}
+    body = json.loads(create.calls.last.request.content)
+    assert body["item"]["name"] == "x"
+    assert tags.delete(1) == {"success": True}
+    assert delete.called
+    for call in (tags.list, lambda: tags.get(1), lambda: tags.update(1, {})):
+        with pytest.raises(LabguruError):
+            call()

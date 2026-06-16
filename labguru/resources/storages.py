@@ -13,7 +13,3 @@ class StoragesResource(BaseResource):
     def update(self, resource_id, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""
         return self.client.put(self._path(f"/{resource_id}"), {self.item_key: fields})
-
-    def boxes(self, resource_id):
-        """GET the storage's boxes."""
-        return self.client.get(self._path(f"/{resource_id}/boxes"))
