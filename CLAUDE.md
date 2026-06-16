@@ -77,6 +77,13 @@ one resource namespace per attribute (`lab.protocols`, `lab.experiments`,
 - **Per-verb support varies by resource** (e.g. most resources have no `DELETE`; an
   unsupported inherited call raises `LabguruAPIError(404)`). The authoritative table
   is the resource support matrix in [MIGRATION.md](MIGRATION.md).
+- **The facade exposes 27 namespaces** (wired in `facade.py`), each shaped to the
+  verbs the spec supports. When adding another: subclass `BaseResource`, set
+  `resource_name`, override `create`/`update` for `item`-wrapping, gate verbs the API
+  lacks only when the resource is *fundamentally* non-CRUD (read-only / create-only /
+  create+delete, like `workflows`/`measurements`/`visualizations`/`tags`); otherwise
+  leave the gap to a runtime 404 and record it in the matrix. Specials:
+  `measurements.create` uses a custom body; `attachments.create` is a multipart upload.
 
 ### Errors (`exceptions.py`)
 

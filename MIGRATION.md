@@ -105,6 +105,9 @@ large step up from the mock-only confidence the test suite provides.
   (Rails merges query and body params). Left as-is; flagged here.
 - **`item` as a string:** `createProtocol` documents `item` as a JSON *string*; the SDK
   sends a nested JSON object. Standard Rails nested params accept this.
+- **Generic-collection create wrapping:** the `createGenericItem` schema is empty in the
+  spec, so `for_generic_collection(...).create(...)` wrapping under `item` is *inferred
+  by analogy* with the other create schemas — confirm via the live smoke test.
 - **DELETE coverage:** `delete()` is inherited everywhere, but the API supports DELETE
   only on `storages`, `tags`, `events`, `units`, `visualizations`. Elsewhere `delete()`
   raises `LabguruAPIError(404)`. Not gated per-method — see the matrix.
@@ -124,17 +127,37 @@ large step up from the mock-only confidence the test suite provides.
 | `tags` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | SDK raises on list/get/update |
 | `members` | ✅ | ❌ | 🚫 | 🚫 | 🚫 | `GET /admin/members` only; SDK raises on writes |
 | `search` | — | — | 🚫 | 🚫 | 🚫 | `global_search(term, size)` only |
-| `biocollections` | ✅ | ✅ | ✅ | ✅ | ❌ | named collections (`/api/v1/<name>`) |
+| `biocollections` | ✅ | ✅ | ✅ | ✅ | ❌ | built-in (`/api/v1/<name>`) via `for_collection`; custom (`/api/v1/biocollections/<name>`) via `for_generic_collection` |
+| `datasets` | ✅ | ✅ | ✅ | ❌ | ❌ | no update/delete endpoint |
+| `documents` | ✅ | ✅ | ✅ | ✅ | ❌ | |
+| `notes` | ✅ | ✅ | ✅ | ✅ | ❌ | |
+| `papers` | ✅ | ✅ | ✅ | ✅ | ❌ | |
+| `reports` | ✅ | ✅ | ✅ | ✅ | ❌ | + `add_cover_to_report`/`add_section_to_report` (not modeled) |
+| `sops` | ✅ | ✅ | ✅ | ✅ | ❌ | |
+| `workflows` | ✅ | ✅ | 🚫 | 🚫 | 🚫 | read-only |
+| `boxes` | ✅ | ✅ | ✅ | ✅ | ❌ | |
+| `instruments` | ✅ | ✅ | ✅ | ✅ | ❌ | equipment |
+| `units` | ✅ | ✅ | ✅ | ❌ | ✅ | no update endpoint |
+| `requests` | ✅ | ✅ | ✅ | ✅ | ❌ | + PATCH state transitions (not modeled) |
+| `measurements` | 🚫 | 🚫 | ✅ | 🚫 | 🚫 | create only; body is `{input_name, experiment_id, item}` |
+| `visualizations` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | create + delete only |
+| `webhooks` | ✅ | ✅ | ✅ | ✅ | ❌ | + `GET /webhooks/list` (not modeled) |
+| `attachments` | ❌ | ✅ | ✅ | ✅ | ❌ | `create` is a multipart upload; no list endpoint |
+| `comments` | ✅ | ✅ | ✅ | ❌ | ❌ | no update/delete endpoint |
 
 ✅ supported · ❌ method exists on the class (inherited) but the endpoint doesn't —
 raises `LabguruAPIError(404)` · 🚫 SDK raises `LabguruError` before calling.
 
 ### Coverage gaps (in the API, not yet on the facade)
 - **`milestones`** (`/api/v1/milestones`) — the 1.x `Folder`. Defensible parity add
-  (`lab.folders`); treat as a separate opt-in, not a correctness fix.
+  (`lab.folders`); treat as a separate opt-in.
 - Many standard biocollections already work via
   `lab.biocollections.for_collection(name)` (antibodies, bacteria, cell_lines,
-  compounds, genes, primers, proteins, sequences, vectors, viruses, …).
-- Not on the facade: `boxes`, `datasets`, `documents`, `instruments`, `notes`,
-  `papers`, `reports`, `requests`, `sops`, `units`, `webhooks`, `workflows`,
-  `attachments`, `comments`, `measurements`, `visualizations`. Add per need.
+  compounds, genes, primers, proteins, sequences, vectors, viruses, …); custom ones
+  via `for_generic_collection(name)`.
+- Custom **action sub-endpoints** of modeled resources are not wrapped: the request
+  PATCH transitions, `reports/add_*`, `webhooks/list`, and the stock actions
+  (`update_stock_amount`, `mark_as_consumed`, …). Reachable via `lab.client` directly.
+- Still not on the facade (add per need): `events`, `flags`, `maintenances` &
+  `maintenance_*`, `materials`, `plates`, `request_templates`, `rodent_*`,
+  `shopping_list`, `teams`, `manifests`.

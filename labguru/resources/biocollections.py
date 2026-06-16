@@ -12,7 +12,18 @@ class BiocollectionsResource(BaseResource):
         self.resource_name = collection
 
     def for_collection(self, collection: str) -> "BiocollectionsResource":
+        """Address a built-in collection at its direct path, e.g.
+        ``for_collection("plasmids")`` -> ``/api/v1/plasmids``.
+        """
         return BiocollectionsResource(self.client, collection)
+
+    def for_generic_collection(self, collection: str) -> "BiocollectionsResource":
+        """Address a custom/generic collection via the ``biocollections/`` prefix,
+        e.g. ``for_generic_collection("my_assays")`` ->
+        ``/api/v1/biocollections/my_assays`` (GET/POST, and PUT/GET on ``/{id}``).
+        This is the 2.0 equivalent of the 1.x generic-inventory-item API.
+        """
+        return BiocollectionsResource(self.client, f"biocollections/{collection}")
 
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""

@@ -48,23 +48,31 @@ A `Labguru` instance exposes one namespace per resource. Each namespace provides
 `delete(id)` (where the API supports them). Every method returns parsed JSON
 (`dict` or `list`); a `204 No Content` response returns `{"success": True}`.
 
+The 27 namespaces, by area:
+
+| Area | Namespaces |
+|---|---|
+| Experiments & knowledge | `projects`, `experiments`, `sections`, `elements`, `protocols`, `datasets`, `documents`, `notes`, `papers`, `reports`, `sops`, `workflows` |
+| Inventory & storage | `biocollections`, `stocks`, `storages`, `boxes`, `instruments`, `units` |
+| Workflow & collaboration | `requests`, `measurements`, `visualizations`, `webhooks`, `attachments`, `comments`, `tags`, `members`, `search` |
+
+Notable shapes (the rest are standard CRUD):
+
 | Namespace | Notes |
 |---|---|
-| `lab.projects` | |
-| `lab.experiments` | |
-| `lab.sections` | experiment procedures; no `list()` (no collection index) |
-| `lab.elements` | pass `container_type`/`container_id`/`element_type`/`data` in the fields dict; list via experiments |
-| `lab.protocols` | |
-| `lab.stocks` | |
-| `lab.storages` | |
-| `lab.tags` | **create + delete only** (list/get/update raise) |
+| `lab.sections` / `lab.elements` | no `list()` (no collection index); list elements via experiments |
+| `lab.tags` / `lab.visualizations` | **create + delete only** |
+| `lab.workflows` | **read-only** (list/get) |
+| `lab.measurements` | **create only**: `create(input_name, experiment_id, item)` |
+| `lab.attachments` | `create(files, data=…)` is a **multipart upload**; no `list()` |
 | `lab.members` | **read-only**, `list()` only (`GET /api/v1/admin/members`) |
 | `lab.search` | `.global_search(term, size=20)` only; writes blocked |
-| `lab.biocollections` | `.for_collection(name)`; `.find_by_external_uuid(uuid)` is **unverified** (see MIGRATION.md) |
+| `lab.biocollections` | `.for_collection(name)` (built-in) / `.for_generic_collection(name)` (custom); `.find_by_external_uuid(uuid)` is **unverified** (see MIGRATION.md) |
 
-> Not every namespace supports every verb — the Labguru API varies by resource.
-> See the **resource support matrix** in [MIGRATION.md](MIGRATION.md) for what each
-> one actually supports (verified against the API spec).
+> Not every namespace supports every verb — the Labguru API varies by resource. The
+> **resource support matrix** in [MIGRATION.md](MIGRATION.md) is the authoritative,
+> spec-verified list of exactly what each namespace supports. An unsupported call
+> either raises `LabguruError` (blocked client-side) or `LabguruAPIError(404)`.
 
 `create`/`update` take the **inner** payload — the SDK wraps it under the API's
 `item` key for you. Pass arbitrary fields (`external_uuid`, `custom1..N`, `tags`)

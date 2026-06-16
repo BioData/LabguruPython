@@ -18,10 +18,16 @@ Ground-up rewrite. **Breaking.**
   Python ≥ 3.9.
 
 ### Added
-- Resource namespaces: `projects`, `experiments`, `sections`, `elements`,
-  `protocols`, `stocks`, `storages`, `tags`, `members` (read-only), `search`
-  (read-only; `global_search`), and `biocollections` (with `for_collection` and
-  `find_by_external_uuid`).
+- 27 resource namespaces covering the documented API surface: `projects`,
+  `experiments`, `sections`, `elements`, `protocols`, `datasets`, `documents`,
+  `notes`, `papers`, `reports`, `sops`, `workflows`, `biocollections`, `stocks`,
+  `storages`, `boxes`, `instruments`, `units`, `requests`, `measurements`,
+  `visualizations`, `webhooks`, `attachments`, `comments`, `tags`, `members`,
+  `search`. Each is shaped to the verbs the API actually supports (read-only,
+  create-only, and create+delete resources block the rest) — see the support matrix
+  in [MIGRATION.md](MIGRATION.md).
+- `biocollections.for_collection(name)` (built-in) and `for_generic_collection(name)`
+  (custom collections, via the `biocollections/` prefix).
 - `create`/`update` forward arbitrary fields (`external_uuid`, `custom1..N`,
   `tags`), wrapping them under the API's `item` key.
 - `LabguruError` / `LabguruAPIError` exception hierarchy.
