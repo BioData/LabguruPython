@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 import httpx
+import json
 
 from labguru.exceptions import LabguruAPIError
 
@@ -71,6 +72,17 @@ class LabguruClient:
 
     def delete(self, path: str, params: Optional[dict] = None) -> Any:
         return self._request("DELETE", path, params=params)
+
+    def post_form(self, path: str, data: Optional[dict] = None) -> Any:
+        """Send form-encoded POST where dict values are JSON-stringified (for endpoints that expect params[:item] as a JSON string)."""
+        encoded = {k: json.dumps(v) if isinstance(v, dict)
+            else v for k, v in (data or {}).items()}
+        return self._request("POST", path, data=encoded)
+
+    def put_form(self, path: str, data: Optional[dict] = None) -> Any:
+        """Send form-encoded PUT where dict values are JSON-stringified."""
+        encoded = {k: json.dumps(v) if isinstance(v, dict) else v for k, v in (data or {}).items()}
+        return self._request("PUT", path, data=encoded)
 
     def post_multipart(self, path: str, files: dict, data: Optional[dict] = None) -> Any:
         """Multipart upload. files = {field: (filename, bytes)}."""
