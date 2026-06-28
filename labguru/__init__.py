@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# labguru/__init__.py
+from labguru.client import LabguruClient
+from labguru.exceptions import LabguruAPIError, LabguruError
+from labguru.facade import Labguru
 
-from .core import Labguru
-from .response import Session
-from .error import UnAuthorizeException, NotFoundException, DuplicatedException
-from .project import Project, Folder, Experiment, Procedure, Element
-from .inventory import InventoryItem, Stock
+__all__ = ["Labguru", "LabguruClient", "LabguruError", "LabguruAPIError"]
+__version__ = "2.0.0"

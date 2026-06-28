@@ -1,295 +1,106 @@
-LabguruPython Repository
-========================
+# LabguruPython
 
-This project is a Python wrapper of Labguru API
+The official Python SDK for the [Labguru](https://www.labguru.com/) API.
 
-`Learn more <https://my.labguru.com/api/docs/>`_.
+API reference: <https://my.labguru.com/api/docs/>
 
----------------
+## Requirements
+
+- Python ≥ 3.9
+- An API token from your Labguru account settings
 
 ## Installation
 
-You can install LabguruPython from github with:
-
-
+```bash
+pip install labguru
 ```
 
-# clone repo
+Or from source:
+
+```bash
 git clone https://github.com/BioData/LabguruPython.git
-
 cd LabguruPython
-
-# install LabguruPython
-python setup.py install
-
+pip install -e ".[dev]"
 ```
 
-Load LabguruPython
+## Quickstart
 
-``` python
+```python
 from labguru import Labguru
+
+lab = Labguru(url="https://my.labguru.com", token="YOUR_API_TOKEN")
+
+# List the first page of protocols
+print(lab.protocols.list(page=1))
+
+# Create a protocol — arbitrary fields are passed straight through
+lab.protocols.create({"name": "My protocol", "external_uuid": "abc"})
 ```
 
-# Authenticate
+> **Upgrading from 1.x?** Authentication changed from email/password to an API
+> token, and calls are now namespaced (`lab.list_projects()` → `lab.projects.list()`).
+> See [MIGRATION.md](MIGRATION.md).
 
-First get an authentication token using labguru_authenticate.
+## Usage
 
-``` python
-lab = Labguru(login="my@email.com", password="mypassword")
+A `Labguru` instance exposes one namespace per resource. Each namespace provides
+`list(page=…, **filters)`, `get(id)`, `create(fields)`, `update(id, fields)`, and
+`delete(id)` (where the API supports them). Every method returns parsed JSON
+(`dict` or `list`); a `204 No Content` response returns `{"success": True}`.
+
+The 27 namespaces, by area:
+
+| Area | Namespaces |
+|---|---|
+| Experiments & knowledge | `projects`, `experiments`, `sections`, `elements`, `protocols`, `datasets`, `documents`, `notes`, `papers`, `reports`, `sops`, `workflows` |
+| Inventory & storage | `biocollections`, `stocks`, `storages`, `boxes`, `instruments`, `units` |
+| Workflow & collaboration | `requests`, `measurements`, `visualizations`, `webhooks`, `attachments`, `comments`, `tags`, `members`, `search` |
+
+Notable shapes (the rest are standard CRUD):
+
+| Namespace | Notes |
+|---|---|
+| `lab.sections` / `lab.elements` | no `list()` (no collection index); list elements via experiments |
+| `lab.tags` / `lab.visualizations` | **create + delete only** |
+| `lab.workflows` | **read-only** (list/get) |
+| `lab.measurements` | **create only**: `create(input_name, experiment_id, item)` |
+| `lab.attachments` | `create(files, data=…)` is a **multipart upload**; no `list()` |
+| `lab.members` | **read-only**, `list()` only (`GET /api/v1/admin/members`) |
+| `lab.search` | `.global_search(term, size=20)` only; writes blocked |
+| `lab.biocollections` | `.for_collection(name)` (built-in) / `.for_generic_collection(name)` (custom); `.find_by_external_uuid(uuid)` is **unverified** (see MIGRATION.md) |
+
+> Not every namespace supports every verb — the Labguru API varies by resource. The
+> **resource support matrix** in [MIGRATION.md](MIGRATION.md) is the authoritative,
+> spec-verified list of exactly what each namespace supports. An unsupported call
+> either raises `LabguruError` (blocked client-side) or `LabguruAPIError(404)`.
+
+`create`/`update` take the **inner** payload — the SDK wraps it under the API's
+`item` key for you. Pass arbitrary fields (`external_uuid`, `custom1..N`, `tags`)
+directly; they are forwarded unchanged.
+
+For Kendo-style server-side filters, drop to the low-level client escape hatch:
+`lab.client.get_with_filters(path, filters=[{"field": ..., "operator": ..., "value": ...}])`.
+The namespaced `list(**params)` methods send their kwargs as plain query params.
+
+```python
+# Work against a named biocollection
+plasmids = lab.biocollections.for_collection("plasmids")
+plasmids.find_by_external_uuid("external-system-123")
+
+# Two instances? Construct one client each.
+source = Labguru(url="https://a.labguru.com", token="TOKEN_A")
+target = Labguru(url="https://b.labguru.com", token="TOKEN_B")
 ```
 
-# Experiment
+## Development
 
-## Project
-
-List all projects
-
-``` python
-projects = lab.list_projects(page_num=1)
-
-# print out project info
-for project in projects:
-    print(project.id, project.title)
+```bash
+pip install -e ".[dev]"
+pytest                      # run the test suite
+pytest tests/test_client.py # run a single file
+ruff check labguru          # lint
 ```
 
-Download project information
-
-``` python
-project_1 = lab.get_project(project_id='1')
-
-print(project_1.id, project.title)
-```
-
-Start new project
-
-``` python
-project_new = lab.add_project(title="My new project", description="This project is an analysis of ...")
-
-print(project_new)
-```
-
-Find a project by name
-
-``` python
-projects = lab.find_projects(name="My new project")
-
-print(projects)
-```
-
-Update a project
-
-``` python
-project_old = lab.get_project(project_id='1')
-print(project_old.id, project_old.title)
-
-project_update = lab.update_project(project_id='1', title="Update new project title")
-
-print(project_update.id, project_update.title)
-```
-
-## Folder
-
-List all folders
-
-``` python
-# project_id=None or not specified - return all folders in all projects (default)
-folders = lab.list_folders(project_id=91, page_num=1)
-
-for folder in folders:
-    print(folder)
-
-```
-
-Download folder information
-
-``` python
-folder_1 = lab.get_folder(folder_id = 31)
-
-print(folder_1)
-```
-
-Start new folder
-
-``` python
-folder_new = lab.add_folder(project_id=91, title="My new folder", description="This folder is a test from LabguruPython")
-
-print(folder_new)
-```
-
-Find a folder by name
-
-``` python
-folders = lab.find_folders(name="My new folder")
-
-print(folders)
-```
-
-Update a folder
-
-``` python
-folder_old = lab.get_folder(folder_id='1')
-print(folder_old.id, folder_old.title)
-
-folder_update = lab.update_folder(folder_id='1', title="Update new folder title")
-
-print(folder_update.id, folder_update.title)
-```
-
-## Experiment
-
-List all experiments
-
-
-
-``` python
-# folder_id=None or not specified - return all experiments in all projects (default)
-experiments = lab.list_experiments(folder_id=410, page_num=1)
-
-for experiment in experiments:
-    print(experiment)
-```
-
-Download experiment information
-
-``` python
-experiment_1 = lab.get_experiment(experiment_id=141)
-
-print(experiment_1)
-```
-
-Start new experiment
-
-``` python
-experiment_new = lab.add_experiment(project_id=91, folder_id=41, title="My new experiment 26-7-2018", \
-                                    description = "This experiment is a test from LabguruR  26-7-2018")
-print(experiment_new)
-```
-
-Find a experiment by name
-
-``` python
-experiments = lab.find_experiments(name="My new experiment")
-
-print(experiments)
-```
-
-Update a experiment
-
-``` python
-experiment_old = lab.get_experiment(experiment_id='1')
-print(experiment_old.id, experiment_old.title)
-
-experiment_update = lab.update_experiment(experiment_id='1', title="Update new experiment title")
-
-print(experiment_update.id, experiment_update.title)
-```
-
-## Experiment procedures
-
-Add section to experiment
-
-``` python
-section = lab.add_experiment_procedure(experiment_id=817, name='test1')
-
-print(section)
-```
-
-Find section
-
-``` python
-sections = lab.find_experiment_procedures(name='test1')
-
-print(sections)
-```
-
-Get section
-
-``` python
-section = lab.get_experiment_procedure(section_id=5514)
-
-print(section)
-```
-
-Update section
-
-``` python
-section = lab.update_experiment_procedure(section_id=5514, name='new name')
-
-print(section)
-```
-
-List sections
-
-``` python
-sections = lab.list_experiment_procedures(experiment_id=817, page_num=1)
-
-print(sections)
-```
-
-## Elements
-
-Add element to section
-
-``` python
-element = lab.add_element(section_id=5478, data=None, element_type='steps')
-
-print(element)
-```
-
-Get element
-
-``` python
-elements = lab.get_element(element_id='1601')
-
-print(elements)
-```
-
-Update element
-
-``` python
-element = lab.update_element(element_id=8117, name='text element', data='<p> add text </p>')
-
-print(element)
-```
-
-List elements by type
-
-``` python
-elements = lab.get_elements_by_type(experiment_id=586, element_type='plate')
-
-print(elements)
-```
-
-## Items
-
-Add item
-
-``` python
-item = lab.add_inventory_item(name='cell_line_1', item_type='cell_lines')
-
-print(item)
-```
-
-Get item
-
-``` python
-items = lab.get_inventory_item(item_id=329, item_type='cell_lines')
-
-print(items)
-```
-
-Update item
-
-``` python
-item = lab.update_inventory_item(item_id=329, item_type='cell_lines', name='new name')
-
-print(item)
-```
-
-List items
-
-``` python
-items = lab.list_inventory_items(item_type='cell_lines', page_num=1)
-
-print(items)
-```
+Transport unit tests use [`respx`](https://lundberg.github.io/respx/) to mock
+httpx. They verify request shaping (URLs, params, body), not a live Labguru
+instance — see the unverified-assumptions ledger in [MIGRATION.md](MIGRATION.md).
