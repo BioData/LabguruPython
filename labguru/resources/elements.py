@@ -1,10 +1,14 @@
 # labguru/resources/elements.py
+from labguru.exceptions import LabguruError
 from labguru.resources.base import BaseResource
 
 
 class ElementsResource(BaseResource):
     resource_name = "elements"
     item_key = "item"
+
+    def list(self, *args, **kwargs):
+        raise LabguruError("elements has no list endpoint in the API; use experiments.elements(id)")
 
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""

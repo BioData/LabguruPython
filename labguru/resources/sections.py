@@ -1,10 +1,14 @@
 # labguru/resources/sections.py
+from labguru.exceptions import LabguruError
 from labguru.resources.base import BaseResource
 
 
 class SectionsResource(BaseResource):
     resource_name = "sections"
     item_key = "item"
+
+    def list(self, *args, **kwargs):
+        raise LabguruError("sections has no list endpoint in the API; read them via an experiment")
 
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""
