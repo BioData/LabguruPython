@@ -25,3 +25,10 @@ class ElementsResource(BaseResource):
         """Update form-element fields; `values` maps field name -> new value and is
         sent as the `form_json` JSON string the API expects."""
         return self.update(resource_id, {"form_json": json.dumps(values)})
+
+    def sort(self, container_id, ordered_ids, container_type="Projects::Experiment"):
+        """Reorder elements in a container: `ordered_ids` is the full new order."""
+        return self.client.post(
+            self._path("/sort"),
+            {"container_id": container_id, "container_type": container_type, "list": ordered_ids},
+        )
