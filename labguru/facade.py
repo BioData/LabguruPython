@@ -18,6 +18,7 @@ from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
 from labguru.resources.notes import NotesResource
 from labguru.resources.papers import PapersResource
+from labguru.resources.pool_events import PoolEventsResource
 from labguru.resources.projects import ProjectsResource
 from labguru.resources.protocols import ProtocolsResource
 from labguru.resources.reports import ReportsResource
@@ -63,6 +64,7 @@ class Labguru:
         # Inventory / storage
         self.biocollections = BiocollectionsResource(self.client)
         self.stocks = StocksResource(self.client)
+        self.pool_events = PoolEventsResource(self.client)
         self.storages = StoragesResource(self.client)
         self.boxes = BoxesResource(self.client)
         self.instruments = InstrumentsResource(self.client)
