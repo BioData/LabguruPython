@@ -18,6 +18,7 @@ from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
 from labguru.resources.notes import NotesResource
 from labguru.resources.papers import PapersResource
+from labguru.resources.plates import PlatesResource
 from labguru.resources.projects import ProjectsResource
 from labguru.resources.protocols import ProtocolsResource
 from labguru.resources.reports import ReportsResource
@@ -65,6 +66,7 @@ class Labguru:
         self.stocks = StocksResource(self.client)
         self.storages = StoragesResource(self.client)
         self.boxes = BoxesResource(self.client)
+        self.plates = PlatesResource(self.client)
         self.instruments = InstrumentsResource(self.client)
         self.units = UnitsResource(self.client)
         # Workflow / collaboration
