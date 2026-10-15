@@ -89,3 +89,6 @@ class LabguruClient:
     def post_multipart(self, path: str, files: dict, data: Optional[dict] = None) -> Any:
         """Multipart upload. files = {field: (filename, bytes)}."""
         return self._request("POST", path, data=data, files=files, timeout=_UPLOAD_TIMEOUT)
+
+    def patch(self, path: str, data: Optional[dict] = None) -> Any:
+        return self._request("PATCH", path, json=data)
