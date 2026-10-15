@@ -22,6 +22,7 @@ from labguru.resources.projects import ProjectsResource
 from labguru.resources.protocols import ProtocolsResource
 from labguru.resources.reports import ReportsResource
 from labguru.resources.requests import RequestsResource
+from labguru.resources.samples import SamplesResource
 from labguru.resources.search import SearchResource
 from labguru.resources.sections import SectionsResource
 from labguru.resources.sops import SopsResource
@@ -63,6 +64,7 @@ class Labguru:
         # Inventory / storage
         self.biocollections = BiocollectionsResource(self.client)
         self.stocks = StocksResource(self.client)
+        self.samples = SamplesResource(self.client)
         self.storages = StoragesResource(self.client)
         self.boxes = BoxesResource(self.client)
         self.instruments = InstrumentsResource(self.client)
