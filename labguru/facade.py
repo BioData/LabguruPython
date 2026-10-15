@@ -20,6 +20,7 @@ from labguru.resources.notes import NotesResource
 from labguru.resources.papers import PapersResource
 from labguru.resources.projects import ProjectsResource
 from labguru.resources.protocols import ProtocolsResource
+from labguru.resources.recipes import RecipesResource
 from labguru.resources.reports import ReportsResource
 from labguru.resources.requests import RequestsResource
 from labguru.resources.search import SearchResource
@@ -53,6 +54,7 @@ class Labguru:
         self.sections = SectionsResource(self.client)
         self.elements = ElementsResource(self.client)
         self.protocols = ProtocolsResource(self.client)
+        self.recipes = RecipesResource(self.client)
         self.datasets = DatasetsResource(self.client)
         self.documents = DocumentsResource(self.client)
         self.notes = NotesResource(self.client)
