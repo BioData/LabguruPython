@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any, Optional, Union
 
+from labguru.client import build_filter_params
+
 
 class BaseResource:
     """CRUD over /api/v1/<resource_name>. Subclasses set `resource_name`."""
@@ -44,6 +46,7 @@ class BaseResource:
         pass through.
         """
         params.update({"kendo": "true", "filter[logic]": logic})
-        if page is not None:
-            params["page"] = page
-        return self.client.get_with_filters(self._path(), filters=filters, params=params)
+        params.update(build_filter_params(filters))
+        # Route through list() so resources without an index (which block list)
+        # reject filter() the same way.
+        return self.list(page=page, **params)
