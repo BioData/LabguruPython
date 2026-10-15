@@ -1,4 +1,5 @@
 import json
+from urllib.parse import parse_qs
 
 import httpx
 import pytest
@@ -41,10 +42,24 @@ def test_protocols_create_passes_arbitrary_fields():
         return_value=httpx.Response(201, json={"id": 5})
     )
     ProtocolsResource(client).create({"name": "PCR", "external_uuid": "src-123", "custom1": "v"})
-    body = json.loads(route.calls.last.request.content)
-    assert body["item"]["external_uuid"] == "src-123"
-    assert body["item"]["custom1"] == "v"
-    assert body["item"]["name"] == "PCR"
+    request = route.calls.last.request
+    assert request.headers["content-type"] == "application/x-www-form-urlencoded"
+    form = parse_qs(request.content.decode())
+    item = json.loads(form["item"][0])
+    assert item == {"name": "PCR", "external_uuid": "src-123", "custom1": "v"}
+
+
+@respx.mock
+def test_protocols_update_sends_form_encoded_item():
+    from labguru.resources.protocols import ProtocolsResource
+    client = LabguruClient(BASE, "t0k")
+    route = respx.put(f"{BASE}/api/v1/protocols/5").mock(
+        return_value=httpx.Response(200, json={"id": 5})
+    )
+    ProtocolsResource(client).update(5, {"name": "PCR v2"})
+    request = route.calls.last.request
+    assert request.headers["content-type"] == "application/x-www-form-urlencoded"
+    assert json.loads(parse_qs(request.content.decode())["item"][0]) == {"name": "PCR v2"}
 
 
 @respx.mock
