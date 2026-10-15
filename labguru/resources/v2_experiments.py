@@ -16,6 +16,13 @@ class ExperimentsV2Resource(BaseResource):
         milestone_id or milestone_name (an existing or new folder)."""
         return self.client.post(self._path(), {self.item_key: fields})
 
+    def copy_section(self, experiment_id, section_ids: list):
+        """Copy sections (from experiments or protocols) into an experiment."""
+        return self.client.post(
+            self._path("/copy_section"),
+            {self.item_key: {"item_id": experiment_id, "section_id": list(section_ids)}},
+        )
+
     def get(self, *args, **kwargs):
         raise LabguruError("v2 experiments supports list and create only; use lab.experiments.get")
 
