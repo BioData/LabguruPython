@@ -43,3 +43,23 @@ class BiocollectionsResource(BaseResource):
         `?external_uuid=` and is UNVERIFIED — see the ledger in MIGRATION.md.
         """
         return self.client.get(self._path(), params={"external_uuid": external_uuid})
+
+    def parents(self, resource_id):
+        """Parent items of an inventory item (GET /{collection}/{id}/get_parents)."""
+        return self.client.get(self._path(f"/{resource_id}/get_parents"))
+
+    def derived_collections(self):
+        """Collections derived from this one (GET /{collection}/get_derived_collections)."""
+        return self.client.get(self._path("/get_derived_collections"))
+
+    def derived_items(self, resource_id, derived_collection_name=None,
+                      derived_collection_id=None):
+        """Items derived from this item, in one derived collection given by name or id."""
+        if not (derived_collection_name or derived_collection_id):
+            raise ValueError("pass derived_collection_name or derived_collection_id")
+        params = {}
+        if derived_collection_name:
+            params["derived_collection_name"] = derived_collection_name
+        if derived_collection_id:
+            params["derived_collection_id"] = derived_collection_id
+        return self.client.get(self._path(f"/{resource_id}/get_derived_items"), params=params)
