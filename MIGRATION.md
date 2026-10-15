@@ -115,6 +115,10 @@ large step up from the mock-only confidence the test suite provides.
 
 ### Resource support matrix (per the spec)
 
+> **Out of date (2026-10-15):** built from the 2026-06-16 spec. The current spec
+> documents `DELETE` on most resources and has other changes. See
+> [API_GAPS.md](API_GAPS.md) for the current endpoint-by-endpoint map.
+
 | SDK namespace | list | get | create | update | delete | Notes |
 |---|:--:|:--:|:--:|:--:|:--:|---|
 | `projects` | ✅ | ✅ | ✅ | ✅ | ❌ | |
