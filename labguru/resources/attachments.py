@@ -15,8 +15,8 @@ class AttachmentsResource(BaseResource):
         """Upload an attachment via multipart/form-data.
 
         e.g. files={"item[attachment]": ("plate.csv", raw_bytes)},
-             data={"item[title]": "plate.csv", "item[attachable_type]": "...",
-                   "item[attach_to_uuid]": experiment_uuid}
+             data={"item[title]": "plate.csv", "item[attach_to_uuid]": experiment_uuid,
+                   "item[description]": "..."}
         """
         return self.client.post_multipart(self._path(), files=files, data=data)
 

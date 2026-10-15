@@ -11,6 +11,25 @@ resources now document `DELETE`, so that matrix's ❌ delete column (and the not
 
 Like MIGRATION.md, this is **spec-verified, not live-verified**.
 
+## Status — implemented as one PR per gap
+
+| Gap | PR / branch |
+|---|---|
+| Branch back to green (protocols form tests, ruff) | #25 |
+| Client: DELETE body · `patch()` · `api_version` | #27 · #28 · #29 |
+| §1 storages wrap · elements.update · units.delete · compounds smiles · tags.untag | #30 · #31 · #32 · #33 · #34 |
+| §2 workflows.delete · measurements.delete | #35 · #36 |
+| §3 projects.delete → v2 | #37 |
+| §3 inherited verbs with no endpoint raise `LabguruError` (optional) | `fix/gate-undocumented-verbs` |
+| §4 experiments · sections.sort · elements.sort · reports · requests · stocks · webhooks · Kendo `filter()` · submodules | #38 · #39 · #40 · #41 · #42 · #43 · #44 · #45 · #46 |
+| §4 `filter()` respects blocked `list()` | `fix/filter-respects-blocked-list` |
+| §5 companies | #47 |
+| §5 events, flags, links, materials, milestones, request_templates, maintenance_* (4), vectors, plates, shopping_list, teams, manifests, forms, recipes, signature_flows, samples, pool_events | `feat/ns-<name>` (one PR each) |
+| §6 `lab.v2`: experiments → copy_section → instruments → rodent_cages → compound_parent_structures | `feat/v2-*` (stacked) |
+| Deliberately not implemented | `POST /api/v1/sessions` (password auth removed in 2.0) |
+
+The sections below describe the gaps as found on 2026-10-15, before these PRs.
+
 ## Totals (341 spec operations)
 
 | Status | Ops | Meaning |

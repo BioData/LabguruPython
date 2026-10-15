@@ -48,22 +48,30 @@ A `Labguru` instance exposes one namespace per resource. Each namespace provides
 `delete(id)` (where the API supports them). Every method returns parsed JSON
 (`dict` or `list`); a `204 No Content` response returns `{"success": True}`.
 
-The 27 namespaces, by area:
+The namespaces, by area:
 
 | Area | Namespaces |
 |---|---|
-| Experiments & knowledge | `projects`, `experiments`, `sections`, `elements`, `protocols`, `datasets`, `documents`, `notes`, `papers`, `reports`, `sops`, `workflows` |
-| Inventory & storage | `biocollections`, `stocks`, `storages`, `boxes`, `instruments`, `units` |
-| Workflow & collaboration | `requests`, `measurements`, `visualizations`, `webhooks`, `attachments`, `comments`, `tags`, `members`, `search` |
+| Experiments & knowledge | `projects`, `milestones` (folders), `experiments`, `sections`, `elements`, `protocols`, `datasets`, `vectors` (dataset vectors), `documents`, `notes`, `papers`, `reports`, `sops`, `recipes`, `forms`, `workflows`, `flags`, `links` |
+| Inventory & storage | `biocollections`, `stocks`, `samples`, `pool_events`, `storages`, `boxes`, `plates`, `manifests`, `instruments`, `maintenances`, `maintenance_types`, `maintenance_templates`, `maintenance_events`, `materials` (consumables), `companies`, `units` |
+| Workflow & collaboration | `requests`, `request_templates`, `shopping_list`, `events`, `measurements`, `visualizations`, `webhooks`, `attachments`, `comments`, `tags`, `members`, `teams`, `signature_flows`, `search` |
+| API v2 only | `lab.v2.experiments`, `lab.v2.reports`, `lab.v2.instruments`, `lab.v2.rodent_cages`, `lab.v2.compound_parent_structures` |
 
 Notable shapes (the rest are standard CRUD):
 
 | Namespace | Notes |
 |---|---|
-| `lab.sections` / `lab.elements` | no `list()` (no collection index); list elements via experiments |
-| `lab.tags` / `lab.visualizations` | **create + delete only** |
-| `lab.workflows` | **read-only** (list/get) |
-| `lab.measurements` | **create only**: `create(input_name, experiment_id, item)` |
+| `lab.sections` / `lab.elements` | no `list()` (no collection index); list elements with `experiments.elements(id, element_type=…)`; both have `sort(container_id, ordered_ids)` |
+| `lab.elements` | `update_text(id, data)` / `update_form(id, values)` — element updates are **not** wrapped under `item` |
+| `lab.storages` | writes wrap under `system_storage_storage` (handled for you) |
+| `lab.units` | `delete(id, unit_type)` — `unit_type` is required |
+| `lab.tags` | create + delete, plus `untag(class_name, item_id, tag)` |
+| `lab.visualizations` | **create + delete only** |
+| `lab.workflows` | list / get / delete |
+| `lab.measurements` | create + delete: `create(input_name, experiment_id, item)` |
+| `lab.requests` | CRUD + `submit` / `approve` / `accept` / `select_performer` / `start` / `done` / `reject` |
+| `lab.stocks` | CRUD + `mark_as_consumed`, `mark_as_output`, `unmark_output`, `update_stock_amount`, `find_by_barcode` |
+| `lab.projects` | `delete(id)` uses the v2 endpoint |
 | `lab.attachments` | `create(files, data=…)` is a **multipart upload**; no `list()` |
 | `lab.members` | **read-only**, `list()` only (`GET /api/v1/admin/members`) |
 | `lab.search` | `.global_search(term, size=20)` only; writes blocked |
@@ -78,9 +86,19 @@ Notable shapes (the rest are standard CRUD):
 `item` key for you. Pass arbitrary fields (`external_uuid`, `custom1..N`, `tags`)
 directly; they are forwarded unchanged.
 
-For Kendo-style server-side filters, drop to the low-level client escape hatch:
-`lab.client.get_with_filters(path, filters=[{"field": ..., "operator": ..., "value": ...}])`.
-The namespaced `list(**params)` methods send their kwargs as plain query params.
+For server-side filtering use `filter()` (the spec's Kendo filter) on biocollections
+and the knowledgebase collections (projects, experiments, protocols, documents,
+reports, datasets, papers, sops):
+
+```python
+lab.biocollections.for_collection("antibodies").filter(
+    [{"field": "title", "operator": "contains", "value": "CD4"}])
+lab.protocols.filter([{"field": "title", "operator": "startswith", "value": "PCR"}],
+                     tag_ids=3)
+```
+
+`list(**params)` sends its kwargs as plain query params (e.g. `meta="true"`);
+`search.global_search(term, size=20, model=…, page=…)` likewise passes extras through.
 
 ```python
 # Work against a named biocollection

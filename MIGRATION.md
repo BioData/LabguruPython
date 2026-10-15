@@ -43,10 +43,12 @@ JSON directly — a `dict` or `list` of `dict`s. Access fields by key
 
 ## Not yet ported
 
-The 1.x element helpers (`get_elements_by_type`, `Element.get_data`,
-`update_stock_amount`, `add_step`, `add_attachment`) and the Opentrons example
-that used them are **not** part of the 2.0 spine. `lab.elements` currently exposes
-generic CRUD only. These rich behaviors are a planned follow-on.
+Partly restored: `get_elements_by_type` → `lab.experiments.elements(id,
+element_type=...)`; `update_stock_amount` → `lab.stocks.update_stock_amount(...)`;
+text/form element edits → `lab.elements.update_text` / `update_form`.
+
+Still not ported: `Element.get_data`, `add_step`, `add_attachment` (use
+`lab.attachments.create`), and the Opentrons example.
 
 ## Requirements
 
@@ -108,60 +110,56 @@ large step up from the mock-only confidence the test suite provides.
 - **Generic-collection create wrapping:** the `createGenericItem` schema is empty in the
   spec, so `for_generic_collection(...).create(...)` wrapping under `item` is *inferred
   by analogy* with the other create schemas — confirm via the live smoke test.
-- **DELETE coverage:** `delete()` is inherited everywhere, but the API supports DELETE
-  only on `storages`, `tags`, `events`, `units`, `visualizations`. Elsewhere `delete()`
-  raises `LabguruAPIError(404)`. Not gated per-method — see the matrix.
+- **DELETE coverage:** the 2026-10-15 spec documents DELETE on most resources (it
+  was absent from the June spec). The one exception is `projects`, whose delete
+  exists only in v2 — `projects.delete` calls `/api/v2/projects/{id}`. See
+  [API_GAPS.md](API_GAPS.md).
 - **Empty responses:** `204`/empty body → `{"success": True}`.
 
-### Resource support matrix (per the spec)
-
-> **Out of date (2026-10-15):** built from the 2026-06-16 spec. The current spec
-> documents `DELETE` on most resources and has other changes. See
-> [API_GAPS.md](API_GAPS.md) for the current endpoint-by-endpoint map.
+### Resource support matrix (per the spec, 2026-10-15)
 
 | SDK namespace | list | get | create | update | delete | Notes |
 |---|:--:|:--:|:--:|:--:|:--:|---|
-| `projects` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `experiments` | ✅ | ✅ | ✅ | ✅ | ❌ | elements via `GET /experiments/{id}/elements` |
-| `protocols` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `stocks` | ✅ | ✅ | ✅ | ✅ | ❌ | extra actions exist (`update_stock_amount`, …) |
-| `storages` | ✅ | ✅ | ✅ | ✅ | ✅ | |
-| `sections` | ❌ | ✅ | ✅ | ✅ | ❌ | no collection index |
-| `elements` | ❌ | ✅ | ✅ | ✅ | ❌ | list via `GET /experiments/{id}/elements` |
-| `tags` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | SDK raises on list/get/update |
-| `members` | ✅ | ❌ | 🚫 | 🚫 | 🚫 | `GET /admin/members` only; SDK raises on writes |
+| `projects` | ✅ | ✅ | ✅ | ✅ | ✅ | delete via `/api/v2` |
+| `milestones` | ✅ | ✅ | ✅ | ✅ | ✅ | folders |
+| `experiments` | ✅ | ✅ | ✅ | ✅ | ✅ | + `elements(id)`, `set_flag(id, flag_id)` |
+| `protocols` | ✅ | ✅ | ✅ | ✅ | ✅ | form-encoded writes (pending live confirmation) |
+| `stocks` | ✅ | ✅ | ✅ | ✅ | ✅ | + consume/output/amount/barcode actions |
+| `storages` | ✅ | ✅ | ✅ | ✅ | ✅ | wraps `system_storage_storage` |
+| `sections` | ❌ | ✅ | ✅ | ✅ | ✅ | + `sort` |
+| `elements` | ❌ | ✅ | ✅ | ✅ | ✅ | `update` unwrapped; + `update_text`/`update_form`/`sort` |
+| `tags` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | + `untag` |
+| `members` | ✅ | ❌ | 🚫 | 🚫 | 🚫 | `GET /admin/members` only |
 | `search` | — | — | 🚫 | 🚫 | 🚫 | `global_search(term, size)` only |
-| `biocollections` | ✅ | ✅ | ✅ | ✅ | ❌ | built-in (`/api/v1/<name>`) via `for_collection`; custom (`/api/v1/biocollections/<name>`) via `for_generic_collection` |
-| `datasets` | ✅ | ✅ | ✅ | ❌ | ❌ | no update/delete endpoint |
-| `documents` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `notes` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `papers` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `reports` | ✅ | ✅ | ✅ | ✅ | ❌ | + `add_cover_to_report`/`add_section_to_report` (not modeled) |
-| `sops` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `workflows` | ✅ | ✅ | 🚫 | 🚫 | 🚫 | read-only |
-| `boxes` | ✅ | ✅ | ✅ | ✅ | ❌ | |
-| `instruments` | ✅ | ✅ | ✅ | ✅ | ❌ | equipment |
-| `units` | ✅ | ✅ | ✅ | ❌ | ✅ | no update endpoint |
-| `requests` | ✅ | ✅ | ✅ | ✅ | ❌ | + PATCH state transitions (not modeled) |
-| `measurements` | 🚫 | 🚫 | ✅ | 🚫 | 🚫 | create only; body is `{input_name, experiment_id, item}` |
-| `visualizations` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | create + delete only |
-| `webhooks` | ✅ | ✅ | ✅ | ✅ | ❌ | + `GET /webhooks/list` (not modeled) |
-| `attachments` | ❌ | ✅ | ✅ | ✅ | ❌ | `create` is a multipart upload; no list endpoint |
-| `comments` | ✅ | ✅ | ✅ | ❌ | ❌ | no update/delete endpoint |
+| `biocollections` | ✅ | ✅ | ✅ | ✅ | ✅ | + `filter`, `parents`, `derived_*`; `**top_level` (compounds `smiles`) |
+| `datasets` | ✅ | ✅ | ✅ | ❌ | ✅ | |
+| `vectors` | ✅ | ✅ | ✅ | ✅ | ✅ | top-level `{dataset_id, vector_data}` |
+| `documents` / `notes` / `papers` / `sops` | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `reports` | ✅ | ✅ | ✅ | ✅ | ✅ | + `add_section`, `add_cover` |
+| `workflows` | ✅ | ✅ | 🚫 | 🚫 | ✅ | |
+| `boxes` / `instruments` | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `units` | ✅ | ✅ | ✅ | ❌ | ✅ | `delete(id, unit_type)` |
+| `requests` | ✅ | ✅ | ✅ | ✅ | ✅ | + 7 PATCH transitions |
+| `measurements` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | body `{input_name, experiment_id, item}` |
+| `visualizations` | 🚫 | 🚫 | ✅ | 🚫 | ✅ | |
+| `webhooks` | ✅ | ✅ | ✅ | ✅ | ✅ | + `available()` |
+| `attachments` | ❌ | ✅ | ✅ | ✅ | ✅ | multipart `create` |
+| `comments` | ✅ | ✅ | ✅ | ❌ | ✅ | |
+| `companies` / `events` / `flags` / `links` / `materials` / `request_templates` / `maintenances` / `maintenance_*` | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `plates` | ✅ | ✅ | 🚫 | 🚫 | ✅ | + `find_by_name`, `duplicate` |
+| `shopping_list` | ✅ | ✅ | ✅ | ✅ | ✅ | `create` = `add_item`; + submit/approve/cancel |
+| `teams` | ✅ | ✅ | 🚫 | 🚫 | ✅ | |
+| `manifests` | ✅ | 🚫 | 🚫 | 🚫 | ✅ | |
+| `forms` / `recipes` / `signature_flows` | 🚫 | 🚫 | 🚫 | 🚫 | ✅ | delete-only in the spec |
+| `samples` | 🚫 | 🚫 | 🚫 | 🚫 | ✅ | + `delete_instrument_usage` |
+| `pool_events` | 🚫 | 🚫 | ✅ | 🚫 | 🚫 | |
+| `lab.v2.*` | | | | | | experiments (list/create/`copy_section`), reports (`copy_section`), instruments & rodent_cages (list), compound_parent_structures (list/get/update/`compounds`) |
 
-✅ supported · ❌ method exists on the class (inherited) but the endpoint doesn't —
-raises `LabguruAPIError(404)` · 🚫 SDK raises `LabguruError` before calling.
+✅ supported · ❌ inherited, no endpoint — runtime `LabguruAPIError(404)` (or
+`LabguruError` if the optional "gate undocumented verbs" PR is merged) · 🚫 SDK raises
+`LabguruError` before calling.
 
-### Coverage gaps (in the API, not yet on the facade)
-- **`milestones`** (`/api/v1/milestones`) — the 1.x `Folder`. Defensible parity add
-  (`lab.folders`); treat as a separate opt-in.
-- Many standard biocollections already work via
-  `lab.biocollections.for_collection(name)` (antibodies, bacteria, cell_lines,
-  compounds, genes, primers, proteins, sequences, vectors, viruses, …); custom ones
-  via `for_generic_collection(name)`.
-- Custom **action sub-endpoints** of modeled resources are not wrapped: the request
-  PATCH transitions, `reports/add_*`, `webhooks/list`, and the stock actions
-  (`update_stock_amount`, `mark_as_consumed`, …). Reachable via `lab.client` directly.
-- Still not on the facade (add per need): `events`, `flags`, `maintenances` &
-  `maintenance_*`, `materials`, `plates`, `request_templates`, `rodent_*`,
-  `shopping_list`, `teams`, `manifests`.
+### Coverage gaps
+
+None remaining against the 2026-10-15 spec except the deliberate omission of
+`POST /api/v1/sessions` (email/password → token). See [API_GAPS.md](API_GAPS.md).
