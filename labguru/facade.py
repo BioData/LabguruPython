@@ -28,6 +28,7 @@ from labguru.resources.sops import SopsResource
 from labguru.resources.stocks import StocksResource
 from labguru.resources.storages import StoragesResource
 from labguru.resources.tags import TagsResource
+from labguru.resources.teams import TeamsResource
 from labguru.resources.units import UnitsResource
 from labguru.resources.visualizations import VisualizationsResource
 from labguru.resources.webhooks import WebhooksResource
@@ -76,4 +77,5 @@ class Labguru:
         self.comments = CommentsResource(self.client)
         self.tags = TagsResource(self.client)
         self.members = MembersResource(self.client)
+        self.teams = TeamsResource(self.client)
         self.search = SearchResource(self.client)
