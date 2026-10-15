@@ -12,6 +12,7 @@ from labguru.resources.comments import CommentsResource
 from labguru.resources.datasets import DatasetsResource
 from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
+from labguru.resources.events import EventsResource
 from labguru.resources.experiments import ExperimentsResource
 from labguru.resources.instruments import InstrumentsResource
 from labguru.resources.measurements import MeasurementsResource
@@ -72,6 +73,7 @@ class Labguru:
         self.measurements = MeasurementsResource(self.client)
         self.visualizations = VisualizationsResource(self.client)
         self.webhooks = WebhooksResource(self.client)
+        self.events = EventsResource(self.client)
         self.attachments = AttachmentsResource(self.client)
         self.comments = CommentsResource(self.client)
         self.tags = TagsResource(self.client)
