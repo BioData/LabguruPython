@@ -5,15 +5,17 @@ from typing import Any, Optional, Union
 
 
 class BaseResource:
-    """CRUD over /api/v1/<resource_name>. Subclasses set `resource_name`."""
+    """CRUD over /api/<api_version>/<resource_name>. Subclasses set `resource_name`
+    (and `api_version` for endpoints that only exist under a later API version)."""
 
     resource_name: str = ""
+    api_version: str = "v1"
 
     def __init__(self, client):
         self.client = client
 
     def _path(self, suffix: str = "") -> str:
-        return f"/api/v1/{self.resource_name}{suffix}"
+        return f"/api/{self.api_version}/{self.resource_name}{suffix}"
 
     def list(self, page: Optional[int] = None, **params: Any) -> Any:
         if page is not None:
