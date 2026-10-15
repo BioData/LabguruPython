@@ -24,6 +24,7 @@ from labguru.resources.reports import ReportsResource
 from labguru.resources.requests import RequestsResource
 from labguru.resources.search import SearchResource
 from labguru.resources.sections import SectionsResource
+from labguru.resources.signature_flows import SignatureFlowsResource
 from labguru.resources.sops import SopsResource
 from labguru.resources.stocks import StocksResource
 from labguru.resources.storages import StoragesResource
@@ -60,6 +61,7 @@ class Labguru:
         self.reports = ReportsResource(self.client)
         self.sops = SopsResource(self.client)
         self.workflows = WorkflowsResource(self.client)
+        self.signature_flows = SignatureFlowsResource(self.client)
         # Inventory / storage
         self.biocollections = BiocollectionsResource(self.client)
         self.stocks = StocksResource(self.client)
