@@ -14,6 +14,7 @@ from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
 from labguru.resources.experiments import ExperimentsResource
 from labguru.resources.instruments import InstrumentsResource
+from labguru.resources.maintenance_events import MaintenanceEventsResource
 from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
 from labguru.resources.notes import NotesResource
@@ -66,6 +67,7 @@ class Labguru:
         self.storages = StoragesResource(self.client)
         self.boxes = BoxesResource(self.client)
         self.instruments = InstrumentsResource(self.client)
+        self.maintenance_events = MaintenanceEventsResource(self.client)
         self.units = UnitsResource(self.client)
         # Workflow / collaboration
         self.requests = RequestsResource(self.client)
