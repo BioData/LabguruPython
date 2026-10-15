@@ -36,13 +36,19 @@ Three layers, all sync:
    `_request` injects the **token as a query param** (Labguru uses no Bearer
    header), raises `LabguruAPIError` on status ≥ 400, and returns `{"success": True}`
    for a 204/empty body, else `resp.json()`. A fresh `httpx.Client` is opened per
-   request (deliberate: no connection pooling). `get_with_filters` builds Kendo-style
-   `filter[filters][i][...]` params via `build_filter_params`.
+   request (deliberate: no connection pooling). Verbs: `get`, `post`, `put`,
+   `patch`, `delete(path, params=None, data=None)` (DELETE may carry a JSON body —
+   `units.delete`, `tags.untag`), `post_form`/`put_form` (form-encoded, dict values
+   JSON-stringified — used by `protocols`), `post_multipart`. `get_with_filters`
+   builds Kendo-style `filter[filters][i][...]` params via `build_filter_params`.
 
-2. **`resources/base.py` — `BaseResource`.** CRUD over `/api/v1/<resource_name>`:
+2. **`resources/base.py` — `BaseResource`.** CRUD over
+   `/api/<api_version>/<resource_name>` (`api_version` defaults to `"v1"`):
    `list(page=, **params)`, `get(id)`, `create(data)`, `update(id, data)`,
-   `delete(id)`. Each method just returns the client's parsed-JSON result. Subclasses
-   set `resource_name`.
+   `delete(id)`, plus `filter(filters, logic="and", page=None, **params)` — the
+   spec's Kendo filter on the collection index, routed through `list()` so a
+   resource that blocks `list` also blocks `filter`. Each method just returns the
+   client's parsed-JSON result. Subclasses set `resource_name`.
 
 3. **Resource classes (`resources/*.py`) + `facade.py`.**
 
@@ -57,27 +63,48 @@ double-wrap. When you add a write-capable resource, override **both** `create` a
 `update` (a past bug: `biocollections` overrode only `create` and inherited an
 unwrapped `update`).
 
+**The wrap key is not always `item`** — check the spec schema for every write:
+`storages` uses `system_storage_storage`; v2 `compound_parent_structures` uses
+`parent_structure`; `elements.update` (`data` / `form_json`), `vectors`
+(`dataset_id`, `vector_data`), `stocks.update_stock_amount` and `measurements.create`
+send top-level fields; compounds put `smiles` beside `item`
+(`biocollections` `create/update(fields, **top_level)`).
+
 ### `facade.py` — the `Labguru` entry point
 
 Constructor takes `url` + `token`. It rejects legacy `login`/`password` kwargs
 (raising `LabguruError`) *before* the falsy `url`/`token` check, and instantiates
 one resource namespace per attribute (`lab.protocols`, `lab.experiments`,
-`lab.projects`, …). Users only touch `Labguru`.
+`lab.projects`, …). Endpoints that exist only under `/api/v2` live on a
+sub-namespace, `lab.v2.<name>` (`labguru/v2.py`: `experiments`, `reports`,
+`instruments`, `rodent_cages`, `compound_parent_structures`), so v1 attributes never
+change meaning. Users only touch `Labguru`.
 
 ### Resource specifics
 
-- **Restricted resources** (verified against the API spec): `members` is read-only
-  at `/api/v1/admin/members` (`list()` only); `search` exposes `global_search(term,
-  size)` only; `tags` supports create + delete only. These override the unsupported
-  inherited methods to raise `LabguruError`.
+- **Restricted resources** (verified against the API spec) override unsupported
+  inherited methods to raise `LabguruError`: `members` (`list()` only, at
+  `/api/v1/admin/members`); `search` (`global_search(term, size)` only); `tags`
+  (create + delete + `untag`); `workflows` (list/get/delete); `measurements` and
+  `visualizations` (create + delete); `plates` (no create/update — plates are plate
+  elements); `teams`, `manifests`, `forms`, `recipes`, `signature_flows`, `samples`,
+  `pool_events`; and the `lab.v2.*` resources.
 - **`biocollections`** is addressed by collection name: `for_collection(name)`
   returns a new instance with `resource_name = name`. `find_by_external_uuid(uuid)`
   exists but is **unverified** — `external_uuid` is not in the API spec (see the
   ledger in MIGRATION.md); real filtering uses the Kendo `/{collection_name}` endpoint.
-- **Per-verb support varies by resource** (e.g. most resources have no `DELETE`; an
-  unsupported inherited call raises `LabguruAPIError(404)`). The authoritative table
-  is the resource support matrix in [MIGRATION.md](MIGRATION.md).
-- **The facade exposes 27 namespaces** (wired in `facade.py`), each shaped to the
+- **Per-verb support varies by resource.** The authoritative endpoint-by-endpoint
+  map is [API_GAPS.md](API_GAPS.md); the per-namespace summary is the support matrix
+  in [MIGRATION.md](MIGRATION.md).
+- **Custom actions** are methods on their namespace, e.g. `requests.submit/approve/
+  accept/select_performer/start/done/reject` (PATCH), `stocks.mark_as_consumed /
+  mark_as_output / unmark_output / update_stock_amount / find_by_barcode`,
+  `experiments.elements / set_flag`, `elements.sort`, `sections.sort`,
+  `reports.add_section / add_cover`, `webhooks.available`, `shopping_list.add_item /
+  submit / approve / cancel`, `plates.find_by_name / duplicate`, biocollection
+  `parents / derived_collections / derived_items`. `projects.delete` calls the v2
+  endpoint (v1 has none).
+- **The facade exposes 48 v1 namespaces plus `lab.v2`** (wired in `facade.py`), each shaped to the
   verbs the spec supports. When adding another: subclass `BaseResource`, set
   `resource_name`, override `create`/`update` for `item`-wrapping, gate verbs the API
   lacks only when the resource is *fundamentally* non-CRUD (read-only / create-only /

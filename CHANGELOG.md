@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased — spec gap closure (2026-10-15)
+
+Closes the gaps in [API_GAPS.md](API_GAPS.md) against the published spec.
+
+### Fixed (request shapes)
+- `storages` writes wrap under `system_storage_storage`.
+- `elements.update` sends its body unwrapped; new `update_text` / `update_form`. **Breaking** for callers relying on `item` wrapping.
+- `units.delete(id, unit_type)` sends the required `unit_type`. **Breaking** (new required arg).
+- `biocollections` `create/update(fields, **top_level)` — compounds `smiles`.
+- `projects.delete` uses `DELETE /api/v2/projects/{id}`.
+- `workflows.delete` and `measurements.delete` are no longer blocked.
+
+### Added
+- Client: `patch()`, DELETE with a JSON body; `BaseResource.api_version`; `BaseResource.filter()` (Kendo).
+- Actions: `tags.untag`, `experiments.elements` / `set_flag`, `elements.sort`, `sections.sort`, `reports.add_section` / `add_cover`, request transitions, stock actions, `webhooks.available`, biocollection `parents` / `derived_collections` / `derived_items`.
+- Namespaces: `companies`, `events`, `flags`, `links`, `materials`, `milestones`, `request_templates`, `maintenances`, `maintenance_types`, `maintenance_templates`, `maintenance_events`, `vectors`, `plates`, `shopping_list`, `teams`, `manifests`, `forms`, `recipes`, `signature_flows`, `samples`, `pool_events`.
+- `lab.v2`: `experiments`, `reports`, `instruments`, `rodent_cages`, `compound_parent_structures`.
+
 ## 2.0.0
 
 Ground-up rewrite. **Breaking.**
