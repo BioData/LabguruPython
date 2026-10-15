@@ -32,6 +32,7 @@ from labguru.resources.units import UnitsResource
 from labguru.resources.visualizations import VisualizationsResource
 from labguru.resources.webhooks import WebhooksResource
 from labguru.resources.workflows import WorkflowsResource
+from labguru.v2 import LabguruV2
 
 
 class Labguru:
@@ -77,3 +78,5 @@ class Labguru:
         self.tags = TagsResource(self.client)
         self.members = MembersResource(self.client)
         self.search = SearchResource(self.client)
+        # Endpoints that exist only under /api/v2
+        self.v2 = LabguruV2(self.client)
