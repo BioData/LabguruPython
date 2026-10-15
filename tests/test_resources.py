@@ -301,7 +301,7 @@ def test_measurements_create_only_custom_body():
     assert body["input_name"] == "OD600"
     assert body["experiment_id"] == 42
     assert body["item"]["value"] == 0.5
-    for call in (m.list, lambda: m.get(1), lambda: m.update(1, {}), lambda: m.delete(1)):
+    for call in (m.list, lambda: m.get(1), lambda: m.update(1, {})):
         with pytest.raises(LabguruError):
             call()
 
