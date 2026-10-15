@@ -3,8 +3,10 @@ from labguru.resources.base import BaseResource
 
 
 class StoragesResource(BaseResource):
+    """Storages wrap writes under `system_storage_storage`, not `item` (per the API spec)."""
+
     resource_name = "storages"
-    item_key = "item"
+    item_key = "system_storage_storage"
 
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""
