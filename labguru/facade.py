@@ -13,6 +13,7 @@ from labguru.resources.datasets import DatasetsResource
 from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
 from labguru.resources.experiments import ExperimentsResource
+from labguru.resources.flags import FlagsResource
 from labguru.resources.instruments import InstrumentsResource
 from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
@@ -60,6 +61,7 @@ class Labguru:
         self.reports = ReportsResource(self.client)
         self.sops = SopsResource(self.client)
         self.workflows = WorkflowsResource(self.client)
+        self.flags = FlagsResource(self.client)
         # Inventory / storage
         self.biocollections = BiocollectionsResource(self.client)
         self.stocks = StocksResource(self.client)
