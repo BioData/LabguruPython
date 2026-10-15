@@ -25,13 +25,18 @@ class BiocollectionsResource(BaseResource):
         """
         return BiocollectionsResource(self.client, f"biocollections/{collection}")
 
-    def create(self, fields: dict):
-        """fields: inner payload, wrapped as {item_key: fields} before sending."""
-        return self.client.post(self._path(), {self.item_key: fields})
+    def create(self, fields: dict, **top_level):
+        """fields: inner payload, wrapped as {item_key: fields} before sending.
+        top_level: extra keys sent beside `item`, e.g. compounds take
+        ``create({...}, smiles="CCO")``.
+        """
+        return self.client.post(self._path(), {**top_level, self.item_key: fields})
 
-    def update(self, resource_id, fields: dict):
-        """fields: inner payload, wrapped as {item_key: fields} before sending."""
-        return self.client.put(self._path(f"/{resource_id}"), {self.item_key: fields})
+    def update(self, resource_id, fields: dict, **top_level):
+        """fields: inner payload, wrapped as {item_key: fields}; top_level as in create."""
+        return self.client.put(
+            self._path(f"/{resource_id}"), {**top_level, self.item_key: fields}
+        )
 
     def find_by_external_uuid(self, external_uuid: str):
         """Look up items by external_uuid.
