@@ -70,8 +70,9 @@ class LabguruClient:
     def put(self, path: str, data: Optional[dict] = None) -> Any:
         return self._request("PUT", path, json=data)
 
-    def delete(self, path: str, params: Optional[dict] = None) -> Any:
-        return self._request("DELETE", path, params=params)
+    def delete(self, path: str, params: Optional[dict] = None, data: Optional[dict] = None) -> Any:
+        """DELETE; ``data`` is sent as a JSON body (some endpoints require one)."""
+        return self._request("DELETE", path, params=params, json=data)
 
     def post_form(self, path: str, data: Optional[dict] = None) -> Any:
         """Send form-encoded POST where dict values are JSON-stringified.
