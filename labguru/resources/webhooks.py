@@ -17,3 +17,8 @@ class WebhooksResource(BaseResource):
     def update(self, resource_id, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""
         return self.client.put(self._path(f"/{resource_id}"), {self.item_key: fields})
+
+    def available(self):
+        """GET /webhooks/list: the webhooks available to configure (spec: "List all
+        webhooks available"), as opposed to `list()`, the account's webhooks."""
+        return self.client.get(self._path("/list"))
