@@ -4,8 +4,9 @@ from labguru.resources.base import BaseResource
 
 
 class MeasurementsResource(BaseResource):
-    """Create-only: POST /api/v1/measurements. The API has no list/get/update/delete
-    endpoint. The body is ``{input_name, experiment_id, item}`` (not just ``item``).
+    """Create and delete: POST /api/v1/measurements, DELETE /api/v1/measurements/{id}.
+    The API has no list/get/update endpoint. The body is
+    ``{input_name, experiment_id, item}`` (not just ``item``).
     """
 
     resource_name = "measurements"
@@ -18,13 +19,10 @@ class MeasurementsResource(BaseResource):
         )
 
     def list(self, *args, **kwargs):
-        raise LabguruError("measurements supports create only; list is not available")
+        raise LabguruError("measurements supports create and delete only; list is not available")
 
     def get(self, *args, **kwargs):
-        raise LabguruError("measurements supports create only; get is not available")
+        raise LabguruError("measurements supports create and delete only; get is not available")
 
     def update(self, *args, **kwargs):
-        raise LabguruError("measurements supports create only; update is not available")
-
-    def delete(self, *args, **kwargs):
-        raise LabguruError("measurements supports create only; delete is not available")
+        raise LabguruError("measurements supports create and delete only; update is not available")
