@@ -1,4 +1,5 @@
 # labguru/resources/units.py
+from labguru.exceptions import LabguruError
 from labguru.resources.base import BaseResource
 
 
@@ -7,6 +8,9 @@ class UnitsResource(BaseResource):
 
     resource_name = "units"
     item_key = "item"
+
+    def update(self, *args, **kwargs):
+        raise LabguruError("units has no update endpoint in the API; units cannot be updated")
 
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""

@@ -1,4 +1,5 @@
 # labguru/resources/attachments.py
+from labguru.exceptions import LabguruError
 from labguru.resources.base import BaseResource
 
 
@@ -10,6 +11,9 @@ class AttachmentsResource(BaseResource):
 
     resource_name = "attachments"
     item_key = "item"
+
+    def list(self, *args, **kwargs):
+        raise LabguruError("attachments has no list endpoint in the API; attachments have no index")
 
     def create(self, files: dict, data: dict = None):
         """Upload an attachment via multipart/form-data.

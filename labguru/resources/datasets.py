@@ -1,4 +1,5 @@
 # labguru/resources/datasets.py
+from labguru.exceptions import LabguruError
 from labguru.resources.base import BaseResource
 
 
@@ -9,6 +10,9 @@ class DatasetsResource(BaseResource):
 
     resource_name = "datasets"
     item_key = "item"
+
+    def update(self, *args, **kwargs):
+        raise LabguruError("datasets has no update endpoint in the API; datasets cannot be updated")
 
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""

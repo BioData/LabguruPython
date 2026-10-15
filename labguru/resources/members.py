@@ -10,6 +10,9 @@ class MembersResource(BaseResource):
 
     resource_name = "admin/members"
 
+    def get(self, *args, **kwargs):
+        raise LabguruError("members has no get endpoint in the API; use members.list()")
+
     def create(self, *args, **kwargs):
         raise LabguruError("members is read-only; create is not supported")
 
