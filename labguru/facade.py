@@ -29,6 +29,7 @@ from labguru.resources.stocks import StocksResource
 from labguru.resources.storages import StoragesResource
 from labguru.resources.tags import TagsResource
 from labguru.resources.units import UnitsResource
+from labguru.resources.vectors import VectorsResource
 from labguru.resources.visualizations import VisualizationsResource
 from labguru.resources.webhooks import WebhooksResource
 from labguru.resources.workflows import WorkflowsResource
@@ -54,6 +55,7 @@ class Labguru:
         self.elements = ElementsResource(self.client)
         self.protocols = ProtocolsResource(self.client)
         self.datasets = DatasetsResource(self.client)
+        self.vectors = VectorsResource(self.client)
         self.documents = DocumentsResource(self.client)
         self.notes = NotesResource(self.client)
         self.papers = PapersResource(self.client)
