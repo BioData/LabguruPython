@@ -11,3 +11,7 @@ class UnitsResource(BaseResource):
     def create(self, fields: dict):
         """fields: inner payload, wrapped as {item_key: fields} before sending."""
         return self.client.post(self._path(), {self.item_key: fields})
+
+    def delete(self, resource_id, unit_type: str):
+        """unit_type is required by the API: "weight", "volume" or "concentration"."""
+        return self.client.delete(self._path(f"/{resource_id}"), data={"unit_type": unit_type})
