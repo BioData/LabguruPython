@@ -13,6 +13,7 @@ from labguru.resources.datasets import DatasetsResource
 from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
 from labguru.resources.experiments import ExperimentsResource
+from labguru.resources.forms import FormsResource
 from labguru.resources.instruments import InstrumentsResource
 from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
@@ -52,6 +53,7 @@ class Labguru:
         self.experiments = ExperimentsResource(self.client)
         self.sections = SectionsResource(self.client)
         self.elements = ElementsResource(self.client)
+        self.forms = FormsResource(self.client)
         self.protocols = ProtocolsResource(self.client)
         self.datasets = DatasetsResource(self.client)
         self.documents = DocumentsResource(self.client)
