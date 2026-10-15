@@ -24,6 +24,7 @@ from labguru.resources.reports import ReportsResource
 from labguru.resources.requests import RequestsResource
 from labguru.resources.search import SearchResource
 from labguru.resources.sections import SectionsResource
+from labguru.resources.shopping_list import ShoppingListResource
 from labguru.resources.sops import SopsResource
 from labguru.resources.stocks import StocksResource
 from labguru.resources.storages import StoragesResource
@@ -69,6 +70,7 @@ class Labguru:
         self.units = UnitsResource(self.client)
         # Workflow / collaboration
         self.requests = RequestsResource(self.client)
+        self.shopping_list = ShoppingListResource(self.client)
         self.measurements = MeasurementsResource(self.client)
         self.visualizations = VisualizationsResource(self.client)
         self.webhooks = WebhooksResource(self.client)
