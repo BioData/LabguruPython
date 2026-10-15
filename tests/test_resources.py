@@ -266,7 +266,7 @@ def test_workflows_is_read_only():
     wf = WorkflowsResource(client)
     respx.get(f"{BASE}/api/v1/workflows").mock(return_value=httpx.Response(200, json=[{"id": 1}]))
     assert wf.list() == [{"id": 1}]
-    for call in (lambda: wf.create({}), lambda: wf.update(1, {}), lambda: wf.delete(1)):
+    for call in (lambda: wf.create({}), lambda: wf.update(1, {})):
         with pytest.raises(LabguruError):
             call()
 

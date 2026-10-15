@@ -4,15 +4,12 @@ from labguru.resources.base import BaseResource
 
 
 class WorkflowsResource(BaseResource):
-    """Read-only. The API exposes GET index and show only — no create/update/delete."""
+    """List, get and delete. The API has no create/update endpoint."""
 
     resource_name = "workflows"
 
     def create(self, *args, **kwargs):
-        raise LabguruError("workflows is read-only; create is not supported")
+        raise LabguruError("workflows has no create endpoint; create is not supported")
 
     def update(self, *args, **kwargs):
-        raise LabguruError("workflows is read-only; update is not supported")
-
-    def delete(self, *args, **kwargs):
-        raise LabguruError("workflows is read-only; delete is not supported")
+        raise LabguruError("workflows has no update endpoint; update is not supported")
