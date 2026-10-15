@@ -23,3 +23,14 @@ class TagsResource(BaseResource):
 
     def update(self, *args, **kwargs):
         raise LabguruError("tags supports create and delete only; update is not available")
+
+    def untag(self, class_name: str, item_id, tag: str):
+        """Remove tag label(s) from an item (``DELETE /api/v1/tags``).
+
+        class_name: e.g. ``"Projects::Experiment"``; tag: one label or a
+        comma-separated list (``"draft,wip"``).
+        """
+        return self.client.delete(
+            self._path(),
+            data={self.item_key: {"class_name": class_name, "item_id": item_id, "tag": tag}},
+        )
