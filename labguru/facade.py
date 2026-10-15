@@ -16,6 +16,7 @@ from labguru.resources.experiments import ExperimentsResource
 from labguru.resources.instruments import InstrumentsResource
 from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
+from labguru.resources.milestones import MilestonesResource
 from labguru.resources.notes import NotesResource
 from labguru.resources.papers import PapersResource
 from labguru.resources.projects import ProjectsResource
@@ -49,6 +50,7 @@ class Labguru:
         self.client = LabguruClient(url, token)
         # Experiment / knowledge resources
         self.projects = ProjectsResource(self.client)
+        self.milestones = MilestonesResource(self.client)
         self.experiments = ExperimentsResource(self.client)
         self.sections = SectionsResource(self.client)
         self.elements = ElementsResource(self.client)
