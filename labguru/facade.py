@@ -14,6 +14,7 @@ from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
 from labguru.resources.experiments import ExperimentsResource
 from labguru.resources.instruments import InstrumentsResource
+from labguru.resources.links import LinksResource
 from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
 from labguru.resources.notes import NotesResource
@@ -74,6 +75,7 @@ class Labguru:
         self.webhooks = WebhooksResource(self.client)
         self.attachments = AttachmentsResource(self.client)
         self.comments = CommentsResource(self.client)
+        self.links = LinksResource(self.client)
         self.tags = TagsResource(self.client)
         self.members = MembersResource(self.client)
         self.search = SearchResource(self.client)
