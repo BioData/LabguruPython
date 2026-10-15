@@ -21,6 +21,7 @@ from labguru.resources.papers import PapersResource
 from labguru.resources.projects import ProjectsResource
 from labguru.resources.protocols import ProtocolsResource
 from labguru.resources.reports import ReportsResource
+from labguru.resources.request_templates import RequestTemplatesResource
 from labguru.resources.requests import RequestsResource
 from labguru.resources.search import SearchResource
 from labguru.resources.sections import SectionsResource
@@ -69,6 +70,7 @@ class Labguru:
         self.units = UnitsResource(self.client)
         # Workflow / collaboration
         self.requests = RequestsResource(self.client)
+        self.request_templates = RequestTemplatesResource(self.client)
         self.measurements = MeasurementsResource(self.client)
         self.visualizations = VisualizationsResource(self.client)
         self.webhooks = WebhooksResource(self.client)
