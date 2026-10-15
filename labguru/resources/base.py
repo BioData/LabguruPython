@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any, Optional, Union
 
+from labguru.client import build_filter_params
+
 
 class BaseResource:
     """CRUD over /api/v1/<resource_name>. Subclasses set `resource_name`."""
@@ -31,3 +33,20 @@ class BaseResource:
 
     def delete(self, resource_id: Union[int, str]) -> Any:
         return self.client.delete(self._path(f"/{resource_id}"))
+
+    def filter(self, filters: list, logic: str = "and", page: Optional[int] = None,
+               **params: Any) -> Any:
+        """Server-side Kendo filter on the collection index (biocollections, and the
+        knowledgebase collections: projects, experiments, protocols, documents,
+        reports, datasets, papers, sops).
+
+        filters: ``[{"field": "title", "operator": "contains", "value": "PCR"}, ...]``.
+        Operators: contains/doesnotcontain, eq/neq, startswith/endswith,
+        isnullorempty/isnotnullorempty. Extra params (e.g. ``tag_ids``, ``meta``)
+        pass through.
+        """
+        params.update({"kendo": "true", "filter[logic]": logic})
+        params.update(build_filter_params(filters))
+        # Route through list() so resources without an index (which block list)
+        # reject filter() the same way.
+        return self.list(page=page, **params)
