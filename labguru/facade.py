@@ -9,6 +9,7 @@ from labguru.resources.attachments import AttachmentsResource
 from labguru.resources.biocollections import BiocollectionsResource
 from labguru.resources.boxes import BoxesResource
 from labguru.resources.comments import CommentsResource
+from labguru.resources.companies import CompaniesResource
 from labguru.resources.datasets import DatasetsResource
 from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
@@ -66,6 +67,7 @@ class Labguru:
         self.storages = StoragesResource(self.client)
         self.boxes = BoxesResource(self.client)
         self.instruments = InstrumentsResource(self.client)
+        self.companies = CompaniesResource(self.client)
         self.units = UnitsResource(self.client)
         # Workflow / collaboration
         self.requests = RequestsResource(self.client)
