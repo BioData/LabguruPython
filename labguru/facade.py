@@ -14,6 +14,7 @@ from labguru.resources.documents import DocumentsResource
 from labguru.resources.elements import ElementsResource
 from labguru.resources.experiments import ExperimentsResource
 from labguru.resources.instruments import InstrumentsResource
+from labguru.resources.manifests import ManifestsResource
 from labguru.resources.measurements import MeasurementsResource
 from labguru.resources.members import MembersResource
 from labguru.resources.notes import NotesResource
@@ -64,6 +65,7 @@ class Labguru:
         self.biocollections = BiocollectionsResource(self.client)
         self.stocks = StocksResource(self.client)
         self.storages = StoragesResource(self.client)
+        self.manifests = ManifestsResource(self.client)
         self.boxes = BoxesResource(self.client)
         self.instruments = InstrumentsResource(self.client)
         self.units = UnitsResource(self.client)
